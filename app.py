@@ -589,9 +589,7 @@ elif page == "🔍 AI Safety Checker":
                             f'Hausa: {herb_row["Hausa"]} • '
                             f'Igbo: {herb_row["Igbo"]}'
                         ),
-                        "warning": (
-                            f'Risk Level: {herb_row["Risk"]} '
-                            f'({herb_row["Category"]})'
+                        "warning": herb_row["Safety_Caution"]
                         )
                     }
                 )
@@ -685,7 +683,7 @@ elif page == "🔍 AI Safety Checker":
                         </p>
 
                         <p>
-                        <strong>Safety Information:</strong>
+                        <strong>Safety Caution:</strong>
                         {herb["warning"]}
                         </p>
 
