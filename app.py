@@ -1,19 +1,6 @@
 import streamlit as st
 import pandas as pd
-
-# ==========================================================
-# LOAD MEDICATION DATABASE
-# ==========================================================
-
-try:
-    medicines_df = pd.read_csv("medicines.csv")
-except FileNotFoundError:
-    st.error("medicines.csv not found. Please make sure it is in the same repository folder as app.py.")
-    st.stop()
-
-medicine_list = sorted(
-    medicines_df["Medicine"].dropna().unique().tolist()
-)
+from ai_engine import generate_ai_explanation
 
 # ==========================================================
 # SMART RX AI — PAGE CONFIGURATION
@@ -23,6 +10,23 @@ st.set_page_config(
     page_title="SmartRx AI",
     page_icon="💊",
     layout="wide"
+)
+
+# ==========================================================
+# LOAD MEDICATION DATABASE
+# ==========================================================
+
+try:
+    medicines_df = pd.read_csv("medicines.csv")
+except FileNotFoundError:
+    st.error(
+        "medicines.csv not found. Please make sure it is "
+        "in the same repository folder as app.py."
+    )
+    st.stop()
+
+medicine_list = sorted(
+    medicines_df["Medicine"].dropna().unique().tolist()
 )
 
 # ==========================================================
@@ -412,119 +416,76 @@ elif page == "🔍 AI Safety Checker":
     </h3>
 
     <p>
-    Select multiple orthodox medicines and up to four Nigerian
-    medicinal herbs. SmartRx AI will screen the selected
-    combination for medication-safety concerns.
+    Select the medicines you want SmartRx AI to analyse.
+    The system will screen the selected medicines for
+    duplicate active ingredients, medicine-class conflicts,
+    and stored safety warnings.
     </p>
 
     </div>
     """, unsafe_allow_html=True)
 
     # ======================================================
-    # ORTHODOX MEDICINES
+    # MEDICINE SELECTION
     # ======================================================
 
-    st.subheader("💊 Select Orthodox Medicines")
+    st.subheader("💊 Select Your Medicines")
 
-    st.caption(
-        "Select as many medicines as necessary for screening."
+    st.write(
+        "You can select up to five medicines for safety screening."
     )
 
     selected_medicines = st.multiselect(
-        "Orthodox Medicines",
+        "Choose medicines",
         medicine_list,
+        max_selections=5,
         placeholder="Search and select medicines..."
     )
 
     # ======================================================
-    # HERBS
+    # HERBAL MEDICINE PLACEHOLDER
     # ======================================================
 
-    st.subheader("🌿 Select Up to Four Local Herbs")
+    st.subheader("🌿 Nigerian Herbal Medicine")
 
-    st.caption(
-        "Select the Nigerian or Traditional African medicinal "
-        "herbs currently being used."
+    st.info(
+        "The Nigerian herbal medicine knowledge base will be "
+        "connected in the next stage."
     )
 
-    herb1 = st.selectbox(
-        "Herb 1",
-        ["None"],
-        key="herb1"
-    )
-
-    herb2 = st.selectbox(
-        "Herb 2",
-        ["None"],
-        key="herb2"
-    )
-
-    herb3 = st.selectbox(
-        "Herb 3",
-        ["None"],
-        key="herb3"
-    )
-
-    herb4 = st.selectbox(
-        "Herb 4",
-        ["None"],
-        key="herb4"
-    )
-
-    selected_herbs = [
-        herb for herb in
-        [herb1, herb2, herb3, herb4]
-        if herb != "None"
-    ]
+    selected_herbs = []
 
     # ======================================================
-    # RUN SCREENING
+    # SAFETY VERIFICATION
     # ======================================================
-
-    st.markdown("<br>", unsafe_allow_html=True)
 
     if st.button(
         "🤖 RUN AI SAFETY VERIFICATION",
         use_container_width=True
     ):
 
-        if len(selected_medicines) == 0:
+        if not selected_medicines:
 
             st.warning(
-                "Please select at least one orthodox medicine."
+                "Please select at least one medicine."
             )
 
         else:
 
-            st.markdown(
-                '<div class="ai-box">',
-                unsafe_allow_html=True
-            )
+            # ==================================================
+            # STRUCTURED MEDICINE SCREENING
+            # ==================================================
 
-            st.subheader("🧠 SmartRx AI Screening")
-
-            st.write(
-                f"**Medicines selected:** "
-                f"{len(selected_medicines)}"
-            )
-
-            st.write(
-                f"**Herbs selected:** "
-                f"{len(selected_herbs)}"
-            )
-
-            # ==============================================
-            # DISPLAY SELECTED MEDICINES
-            # ==============================================
-
-            selected_data = medicines_df[
-                medicines_df["Medicine"].isin(selected_medicines)
+            chosen = medicines_df[
+                medicines_df["Medicine"].isin(
+                    selected_medicines
+                )
             ]
 
-            st.subheader("💊 Selected Medicines")
+            st.subheader("📋 Selected Medicines")
 
             st.dataframe(
-                selected_data[
+                chosen[
                     [
                         "Medicine",
                         "Ingredient",
@@ -536,13 +497,13 @@ elif page == "🔍 AI Safety Checker":
                 hide_index=True
             )
 
-            # ==============================================
-            # DUPLICATE ACTIVE INGREDIENT SCREENING
-            # ==============================================
+            # ==================================================
+            # DUPLICATE INGREDIENT ANALYSIS
+            # ==================================================
 
             ingredient_count = {}
 
-            for ingredient in selected_data["Ingredient"]:
+            for ingredient in chosen["Ingredient"].dropna():
 
                 ingredients = [
                     item.strip()
@@ -562,125 +523,113 @@ elif page == "🔍 AI Safety Checker":
                 if count > 1
             ]
 
-            if duplicates:
-
-                st.markdown(
-                    """
-                    <div class="danger">
-
-                    <h3>
-                    🚨 Duplicate Active Ingredient Detected
-                    </h3>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-                for duplicate in duplicates:
-
-                    st.write(
-                        f"**Duplicate Ingredient:** "
-                        f"{duplicate}"
-                    )
-
-            else:
-
-                st.markdown(
-                    """
-                    <div class="safe">
-
-                    <h3>
-                    ✅ No Duplicate Active Ingredients Detected
-                    </h3>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-            # ==============================================
-            # MEDICINE CATEGORY SCREENING
-            # ==============================================
+            # ==================================================
+            # CATEGORY ANALYSIS
+            # ==================================================
 
             categories = (
-                selected_data["Category"]
+                chosen["Category"]
                 .dropna()
                 .tolist()
             )
 
+            category_warnings = []
+
             if categories.count("NSAID") > 1:
 
-                st.markdown(
-                    """
-                    <div class="warning">
-
-                    <h3>
-                    ⚠ NSAID Combination Warning
-                    </h3>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-                st.write(
+                category_warnings.append(
                     "Multiple NSAID medicines were selected. "
-                    "Combining NSAIDs may increase the risk of "
-                    "gastrointestinal irritation and bleeding."
+                    "Combining NSAIDs may increase the risk "
+                    "of stomach irritation and bleeding."
                 )
 
-            # ==============================================
-            # MEDICINE WARNINGS
-            # ==============================================
+            # ==================================================
+            # STRUCTURED SAFETY FINDINGS
+            # ==================================================
 
-            st.subheader("⚠️ Medicine-Specific Warnings")
+            safety_findings = {
+                "selected_medicines": selected_medicines,
+                "duplicate_active_ingredients": duplicates,
+                "category_warnings": category_warnings,
+                "medicine_warnings": [
+                    {
+                        "medicine": row["Medicine"],
+                        "warning": row["Warning"]
+                    }
+                    for _, row in chosen.iterrows()
+                ],
+                "selected_herbs": selected_herbs
+            }
 
-            for _, row in selected_data.iterrows():
+            # ==================================================
+            # DISPLAY STRUCTURED FINDINGS
+            # ==================================================
 
-                st.write(
-                    f"**{row['Medicine']}** — "
-                    f"{row['Warning']}"
+            if duplicates:
+
+                st.markdown("""
+                <div class="danger">
+
+                <h3>🚨 Duplicate Active Ingredient Detected</h3>
+
+                </div>
+                """, unsafe_allow_html=True)
+
+                for duplicate in duplicates:
+
+                    st.write(
+                        f"**Duplicate Active Ingredient:** "
+                        f"{duplicate}"
+                    )
+
+            if category_warnings:
+
+                st.markdown("""
+                <div class="warning">
+
+                <h3>⚠ Medicine Combination Warning</h3>
+
+                </div>
+                """, unsafe_allow_html=True)
+
+                for warning in category_warnings:
+
+                    st.write(warning)
+
+            if not duplicates and not category_warnings:
+
+                st.markdown("""
+                <div class="safe">
+
+                <h3>✅ No Major Issue Detected by Current Rules</h3>
+
+                </div>
+                """, unsafe_allow_html=True)
+
+            # ==================================================
+            # AI EXPLANATION
+            # ==================================================
+
+            st.subheader("🤖 AI Safety Explanation")
+
+            with st.spinner(
+                "SmartRx AI is generating a safety explanation..."
+            ):
+
+                ai_explanation = generate_ai_explanation(
+                    safety_findings
                 )
-
-            # ==============================================
-            # HERBAL SCREENING PLACEHOLDER
-            # ==============================================
-
-            if selected_herbs:
-
-                st.subheader("🌿 Selected Traditional Herbs")
-
-                for herb in selected_herbs:
-
-                    st.write(f"• {herb}")
-
-                st.info(
-                    "Herb–drug interaction analysis will be "
-                    "activated when the SmartRx AI ethnobotanical "
-                    "knowledge base is connected."
-                )
-
-            # ==============================================
-            # AI EXPLANATION LAYER
-            # ==============================================
 
             st.markdown(
-                """
+                f"""
                 <div class="ai-box">
 
                 <h3 style="color:#4338CA;">
-                🤖 Meta AI Explanation Layer
+                🤖 Muse Glimmer AI Explanation
                 </h3>
 
                 <p>
-                The structured safety findings above will form
-                the input to the Meta AI explanation layer.
-                </p>
-
-                <p>
-                The AI will transform technical screening results
-                into clearer, user-friendly safety explanations.
+                {ai_explanation}
                 </p>
 
                 </div>
@@ -688,17 +637,15 @@ elif page == "🔍 AI Safety Checker":
                 unsafe_allow_html=True
             )
 
-            st.markdown("</div>", unsafe_allow_html=True)
-
-            # ==============================================
+            # ==================================================
             # DISCLAIMER
-            # ==============================================
+            # ==================================================
 
             st.info(
-                "⚠️ SmartRx AI is an educational and "
-                "clinical decision-support tool. It does not "
-                "replace advice from a qualified doctor, "
-                "pharmacist or other healthcare professional."
+                "⚠️ SmartRx AI provides educational and "
+                "decision-support information only. It does "
+                "not diagnose medical conditions or replace "
+                "a qualified doctor or pharmacist."
             )
 # ==========================================================
 # FOOTER
