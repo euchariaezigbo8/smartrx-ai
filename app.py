@@ -605,11 +605,11 @@ elif page == "🔍 AI Safety Checker":
                         "warning": warning
                     }
                 )
-            # ==================================================
+                        # ==================================================
             # STRUCTURED SAFETY FINDINGS
             # ==================================================
 
-        safety_findings = {
+            safety_findings = {
                 "selected_medicines": selected_medicines,
                 "duplicate_active_ingredients": duplicates,
                 "category_warnings": category_warnings,
@@ -640,8 +640,7 @@ elif page == "🔍 AI Safety Checker":
                 for duplicate in duplicates:
 
                     st.write(
-                        f"**Duplicate Active Ingredient:** "
-                        f"{duplicate}"
+                        f"**Duplicate Active Ingredient:** {duplicate}"
                     )
 
             if category_warnings:
@@ -667,7 +666,6 @@ elif page == "🔍 AI Safety Checker":
 
                 </div>
                 """, unsafe_allow_html=True)
-
             # ==================================================
             # HERBAL SAFETY FINDINGS
             # ==================================================
