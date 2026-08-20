@@ -4,7 +4,6 @@ import streamlit as st
 
 def generate_ai_explanation(safety_findings):
 
-```
 try:
     hf_token = st.secrets.get("HF_TOKEN", os.getenv("HF_TOKEN"))
 except Exception:
@@ -19,7 +18,6 @@ if not hf_token:
     )
 
 prompt = f"""
-```
 
 You are the AI intelligence layer of SmartRx AI,
 a Nigerian medication and herbal safety intelligence platform.
@@ -58,7 +56,6 @@ SmartRx AI is an educational and decision-support platform.
 It does not replace professional medical advice.
 """
 
-```
 try:
 
     response = requests.post(
