@@ -579,21 +579,18 @@ elif page == "🔍 AI Safety Checker":
 
             for _, herb_row in selected_herb_data.iterrows():
 
-                herbal_findings.append(
+                                herbal_findings.append(
                     {
                         "herb": herb_row["Herb"],
                         "scientific_name": herb_row["Scientific"],
                         "traditional_use": (
-                            f'{herb_row["English"]} • '
                             f'Yoruba: {herb_row["Yoruba"]} • '
                             f'Hausa: {herb_row["Hausa"]} • '
                             f'Igbo: {herb_row["Igbo"]}'
                         ),
                         "warning": herb_row["Safety_Caution"]
-                        )
                     }
                 )
-
             # ==================================================
             # STRUCTURED SAFETY FINDINGS
             # ==================================================
