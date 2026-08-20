@@ -10,7 +10,6 @@ import streamlit as st
 
 def generate_ai_explanation(safety_findings):
 
-```
 try:
     hf_token = st.secrets.get(
         "HF_TOKEN",
