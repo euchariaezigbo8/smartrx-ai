@@ -3,6 +3,40 @@ import pandas as pd
 from ai_engine import generate_ai_explanation
 
 # ==========================================================
+# LOAD HERBAL MEDICINE DATABASE
+# ==========================================================
+
+try:
+    herbs_df = pd.read_csv("herbs.csv")
+except FileNotFoundError:
+    st.error(
+        "herbs.csv not found. Please make sure it is "
+        "in the same repository folder as app.py."
+    )
+    st.stop()
+
+herb_list = sorted(
+    herbs_df["Herb"].dropna().unique().tolist()
+)
+
+# ==========================================================
+# LOAD MEDICATION DATABASE
+# ==========================================================
+
+try:
+    medicines_df = pd.read_csv("medicines.csv")
+except FileNotFoundError:
+    st.error(
+        "medicines.csv not found. Please make sure it is "
+        "in the same repository folder as app.py."
+    )
+    st.stop()
+
+medicine_list = sorted(
+    medicines_df["Medicine"].dropna().unique().tolist()
+)
+
+# ==========================================================
 # SMART RX AI — PAGE CONFIGURATION
 # ==========================================================
 
