@@ -503,7 +503,7 @@ if st.button(
     use_container_width=True
 ):
 
-    if not selected_medicines:
+            if not selected_medicines:
 
             st.warning(
                 "Please select at least one medicine."
@@ -572,7 +572,7 @@ if st.button(
                 .tolist()
             )
 
-                        category_warnings = []
+            category_warnings = []
 
             if categories.count("NSAID") > 1:
 
@@ -629,7 +629,6 @@ if st.button(
                 ],
                 "selected_herbs": herbal_findings
             }
-
             # ==================================================
             # DISPLAY STRUCTURED FINDINGS
             # ==================================================
