@@ -675,7 +675,7 @@ elif page == "🔍 AI Safety Checker":
                         </p>
 
                         <p>
-                        <strong>Traditional Use:</strong>
+                        <strong>Traditional Names:</strong>
                         {herb["traditional_use"]}
                         </p>
 
