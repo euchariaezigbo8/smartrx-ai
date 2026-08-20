@@ -3,26 +3,27 @@ import requests
 
 
 # ==========================================================
-# SMART RX AI — META AI ENGINE
+# SMART RX AI — META MUSE GLIMMER ENGINE
 # ==========================================================
 
 def generate_ai_explanation(safety_findings):
 
     """
     Sends structured SmartRx AI safety findings
-    to a Meta AI-compatible inference endpoint.
+    to Meta's Muse Glimmer model through
+    Hugging Face Inference Providers.
 
-    The API key is read securely from an environment
-    variable and is never stored in the repository.
+    The Hugging Face token is stored securely
+    and is never placed inside the repository.
     """
 
-    api_key = os.getenv("META_AI_API_KEY")
+    hf_token = os.getenv("HF_TOKEN")
 
-    if not api_key:
+    if not hf_token:
         return (
-            "AI explanation is currently unavailable. "
-            "The structured SmartRx safety screening has "
-            "still been completed."
+            "🤖 AI explanation is currently unavailable.\n\n"
+            "The structured SmartRx AI safety screening "
+            "has still been completed."
         )
 
     prompt = f"""
@@ -31,19 +32,19 @@ a Nigerian medication and herbal safety platform.
 
 Review the structured safety findings below.
 
-Your task is to:
+Your responsibilities are to:
+
 1. Explain the identified medication safety issues.
 2. Explain any duplicate active ingredients.
 3. Explain potential herb–drug interaction concerns.
-4. Clearly distinguish confirmed database findings
-   from areas where evidence is limited.
-5. Provide a concise, understandable safety summary.
+4. Clearly distinguish database findings from uncertainty.
+5. Provide a concise and understandable safety summary.
 6. Never invent a drug interaction or medical fact.
 7. Do not diagnose the user.
-8. Encourage consultation with a qualified healthcare
-   professional where appropriate.
+8. Recommend consultation with a qualified healthcare
+   professional when appropriate.
 
-Structured SmartRx AI findings:
+STRUCTURED SMARTRX AI FINDINGS:
 
 {safety_findings}
 
@@ -56,11 +57,11 @@ for a medication-safety application.
         response = requests.post(
             "https://router.huggingface.co/v1/chat/completions",
             headers={
-                "Authorization": f"Bearer {api_key}",
+                "Authorization": f"Bearer {hf_token}",
                 "Content-Type": "application/json"
             },
             json={
-                "model": "meta-models/Muse-Glimmer-30B",
+                "model": "meta-models/Muse-Glimmer-30B:together",
                 "messages": [
                     {
                         "role": "user",
@@ -70,7 +71,7 @@ for a medication-safety application.
                 "temperature": 0.2,
                 "max_tokens": 700
             },
-            timeout=60
+            timeout=90
         )
 
         response.raise_for_status()
@@ -79,10 +80,10 @@ for a medication-safety application.
 
         return result["choices"][0]["message"]["content"]
 
-    except Exception as error:
-
+    except Exception:
         return (
-            "AI explanation could not be generated at this time.\n\n"
-            f"Technical status: {error}\n\n"
-            "The structured SmartRx safety screening remains available."
+            "🤖 The AI explanation service is temporarily "
+            "unavailable.\n\n"
+            "The structured SmartRx AI safety screening "
+            "remains available."
         )
