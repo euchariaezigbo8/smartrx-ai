@@ -521,61 +521,61 @@ elif page == "🔍 AI Safety Checker":
                 hide_index=True
             )
 
+                        # ==================================================
+            # DUPLICATE INGREDIENT ANALYSIS
             # ==================================================
-# DUPLICATE INGREDIENT ANALYSIS
-# ==================================================
 
-ingredient_count = {}
+            ingredient_count = {}
 
-# Count each active ingredient across selected medicines
-for ingredient in chosen["Ingredient"].dropna():
+            # Count each individual active ingredient
+            for ingredient in chosen["Ingredient"].dropna():
 
-    ingredients = [
-        item.strip()
-        for item in str(ingredient).split("+")
-    ]
+                ingredients = [
+                    item.strip()
+                    for item in str(ingredient).split("+")
+                ]
 
-    for item in ingredients:
+                for item in ingredients:
 
-        ingredient_count[item] = (
-            ingredient_count.get(item, 0) + 1
-        )
+                    ingredient_count[item] = (
+                        ingredient_count.get(item, 0) + 1
+                    )
 
-
-# ==================================================
-# IDENTIFY DUPLICATE INGREDIENTS
-# AND THE MEDICINES THAT CONTAIN THEM
-# ==================================================
-
-duplicates = []
-
-for ingredient, count in ingredient_count.items():
-
-    if count > 1:
-
-        medicines_with_ingredient = []
-
-        for _, medicine_row in chosen.iterrows():
-
-            medicine_ingredients = [
-                item.strip()
-                for item in str(
-                    medicine_row["Ingredient"]
-                ).split("+")
+            # Identify ingredients appearing in more than one medicine
+            duplicates = [
+                ingredient
+                for ingredient, count in ingredient_count.items()
+                if count > 1
             ]
 
-            if ingredient in medicine_ingredients:
+            # Store the medicines responsible for each duplicate
+            duplicate_details = []
 
-                medicines_with_ingredient.append(
-                    medicine_row["Medicine"]
+            for ingredient in duplicates:
+
+                medicines_with_ingredient = []
+
+                for _, medicine_row in chosen.iterrows():
+
+                    medicine_ingredients = [
+                        item.strip()
+                        for item in str(
+                            medicine_row["Ingredient"]
+                        ).split("+")
+                    ]
+
+                    if ingredient in medicine_ingredients:
+
+                        medicines_with_ingredient.append(
+                            medicine_row["Medicine"]
+                        )
+
+                duplicate_details.append(
+                    {
+                        "ingredient": ingredient,
+                        "medicines": medicines_with_ingredient
+                    }
                 )
-
-        duplicates.append(
-            {
-                "ingredient": ingredient,
-                "medicines": medicines_with_ingredient
-            }
-        )
 
             # ==================================================
             # CATEGORY ANALYSIS
