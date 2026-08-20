@@ -4,25 +4,35 @@ import streamlit as st
 
 
 # ==========================================================
-# SMART RX AI — META LLAMA AI ENGINE
+# SMART RX AI — AI EXPLANATION ENGINE
 # ==========================================================
 
 def generate_ai_explanation(safety_findings):
+
+    """
+    Generates an explainable medication and herbal
+    safety summary using Meta Llama through
+    Hugging Face Inference Providers.
+    """
 
     # ======================================================
     # GET HUGGING FACE TOKEN
     # ======================================================
 
     try:
-        hf_token = st.secrets["HF_TOKEN"]
+        hf_token = st.secrets.get("HF_TOKEN")
     except Exception:
+        hf_token = None
+
+    if not hf_token:
         hf_token = os.getenv("HF_TOKEN")
 
     if not hf_token:
         return (
-            "🤖 The AI explanation service is not connected.\n\n"
-            "Please make sure HF_TOKEN has been added to "
-            "Streamlit Cloud Secrets."
+            "🤖 Meta AI is currently unavailable.\n\n"
+            "The Hugging Face API token was not detected. "
+            "The structured SmartRx AI safety screening "
+            "has still been completed."
         )
 
     # ======================================================
@@ -33,12 +43,10 @@ def generate_ai_explanation(safety_findings):
 You are the AI intelligence layer of SmartRx AI,
 a Nigerian medication and herbal safety intelligence platform.
 
-SmartRx AI has already performed structured safety screening.
+You are given structured findings produced by the
+SmartRx AI rule-based safety engine.
 
-Your job is to explain ONLY the information contained
-in the structured findings below.
-
-Do not invent information.
+Explain ONLY the information contained in those findings.
 
 STRUCTURED SMART RX AI FINDINGS:
 
@@ -54,45 +62,39 @@ IMPORTANT SAFETY RULES:
 - Explain only the information contained in the findings.
 - Clearly explain duplicate active ingredients.
 - NEVER assign a duplicate ingredient to a specific medicine
-  unless that medicine-ingredient relationship is explicitly
-  provided in the supplied findings.
+  unless that relationship is explicitly provided in the findings.
 - Do not guess which medicine contains a duplicate ingredient.
 - Clearly explain medicine-class warnings.
 - Keep duplicate-ingredient findings separate from
   medicine-class warnings.
 - Do not transfer a warning from one finding to another.
 - Only associate stomach irritation and bleeding warnings
-  with NSAID combination warnings when that warning is
-  explicitly provided in the findings.
-- Explain the scientific names and traditional Nigerian names
-  of the selected herbs.
+  with NSAID combination warnings when explicitly provided.
+- Explain the scientific names of selected herbs.
+- Explain the traditional Nigerian names of selected herbs.
 - Explain the safety cautions stored in the SmartRx database.
-- Do not create additional herb-drug interactions that are
-  not explicitly provided in the findings.
-- If a specific herb-drug interaction is not established by
-  the supplied findings, clearly say so.
+- Do not create additional herb-drug interactions.
+- If a specific herb-drug interaction is not established
+  by the supplied findings, clearly say so.
 - Use simple language suitable for a general Nigerian audience.
 - Recommend consultation with a qualified doctor or pharmacist
   when a safety concern is identified.
 
-Use these sections:
+Use exactly these sections:
 
 ### Overall Safety Summary
 
-Briefly summarize the main findings without adding information
-that is not contained in the supplied findings.
+Briefly summarize the main findings.
 
 ### Medicine Findings
 
 Explain the selected medicines, duplicate ingredients,
-and medicine-class warnings. Do not guess which medicine
-contains a duplicate ingredient unless the supplied findings
-explicitly establish that relationship.
+and medicine-class warnings.
 
 ### Herbal Findings
 
 Explain the selected herbs, their scientific names,
-traditional Nigerian names, and their safety cautions.
+traditional Nigerian names, and safety cautions.
 
 ### Important Safety Advice
 
@@ -106,42 +108,31 @@ or pharmacist.
 Remember that SmartRx AI is an educational and
 decision-support platform. It does not replace professional
 medical advice.
+"""
 
     # ======================================================
-    # HUGGING FACE API REQUEST
+    # SEND REQUEST TO HUGGING FACE
     # ======================================================
 
     try:
 
         response = requests.post(
             "https://router.huggingface.co/v1/chat/completions",
-
             headers={
                 "Authorization": f"Bearer {hf_token}",
                 "Content-Type": "application/json"
             },
-
             json={
                 "model": "meta-llama/Llama-3.1-8B-Instruct",
-
                 "messages": [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are the safe and explainable "
-                            "AI intelligence layer of SmartRx AI."
-                        )
-                    },
                     {
                         "role": "user",
                         "content": prompt
                     }
                 ],
-
                 "temperature": 0.2,
                 "max_tokens": 700
             },
-
             timeout=90
         )
 
@@ -157,93 +148,56 @@ medical advice.
         # EXTRACT AI RESPONSE
         # ==================================================
 
-        if (
-            "choices" in result
-            and len(result["choices"]) > 0
-        ):
+        choices = result.get("choices", [])
 
-            message = result["choices"][0].get(
-                "message",
-                {}
-            )
+        if choices:
 
-            content = message.get(
-                "content",
-                ""
-            )
+            message = choices[0].get("message", {})
+
+            content = message.get("content", "")
 
             if content:
-                return content.strip()
+                return content
 
         return (
-            "🤖 The AI service returned an empty response.\n\n"
+            "🤖 Meta AI returned an unexpected response.\n\n"
             "The structured SmartRx AI safety screening "
             "has still been completed."
         )
 
     # ======================================================
-    # HANDLE TIMEOUT
+    # TIMEOUT
     # ======================================================
 
     except requests.exceptions.Timeout:
 
         return (
-            "🤖 The AI explanation service timed out.\n\n"
-            "Please try the verification again. "
+            "🤖 Meta AI took too long to respond.\n\n"
+            "Please try the safety verification again. "
             "The structured SmartRx AI safety screening "
             "has still been completed."
         )
 
     # ======================================================
-    # HANDLE HTTP/API ERRORS
+    # API / CONNECTION ERROR
     # ======================================================
 
-    except requests.exceptions.HTTPError:
-
-        try:
-            error_details = response.json()
-
-            error_text = error_details.get(
-                "error",
-                "Hugging Face API request failed."
-            )
-
-        except Exception:
-            error_text = (
-                "Hugging Face API request failed."
-            )
+    except requests.exceptions.RequestException as error:
 
         return (
-            "🤖 The AI explanation service could not "
-            "complete the request.\n\n"
-            f"API message: {error_text}\n\n"
+            "🤖 Meta AI is temporarily unavailable.\n\n"
             "The structured SmartRx AI safety screening "
             "has still been completed."
         )
 
     # ======================================================
-    # HANDLE CONNECTION ERRORS
+    # OTHER ERROR
     # ======================================================
 
-    except requests.exceptions.RequestException:
+    except Exception:
 
         return (
-            "🤖 The AI explanation service is temporarily "
-            "unavailable.\n\n"
-            "The structured SmartRx AI safety screening "
-            "has still been completed."
-        )
-
-    # ======================================================
-    # HANDLE OTHER ERRORS
-    # ======================================================
-
-    except Exception as error:
-
-        return (
-            "🤖 The AI explanation service encountered "
-            "an unexpected error.\n\n"
-            f"Technical message: {error}\n\n"
+            "🤖 Meta AI encountered an unexpected error.\n\n"
             "The structured SmartRx AI safety screening "
             "has still been completed."
         )
