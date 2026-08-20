@@ -503,7 +503,7 @@ if st.button(
     use_container_width=True
 ):
 
-            if not selected_medicines:
+                    if not selected_medicines:
 
             st.warning(
                 "Please select at least one medicine."
