@@ -53,10 +53,22 @@ IMPORTANT SAFETY RULES:
 - Do not invent herbal benefits or medical claims.
 - Explain only the information contained in the findings.
 - Clearly explain duplicate active ingredients.
+- NEVER assign a duplicate ingredient to a specific medicine
+  unless that medicine-ingredient relationship is explicitly
+  provided in the supplied findings.
+- Do not guess which medicine contains a duplicate ingredient.
 - Clearly explain medicine-class warnings.
+- Keep duplicate-ingredient findings separate from
+  medicine-class warnings.
+- Do not transfer a warning from one finding to another.
+- Only associate stomach irritation and bleeding warnings
+  with NSAID combination warnings when that warning is
+  explicitly provided in the findings.
 - Explain the scientific names and traditional Nigerian names
   of the selected herbs.
 - Explain the safety cautions stored in the SmartRx database.
+- Do not create additional herb-drug interactions that are
+  not explicitly provided in the findings.
 - If a specific herb-drug interaction is not established by
   the supplied findings, clearly say so.
 - Use simple language suitable for a general Nigerian audience.
@@ -67,12 +79,15 @@ Use these sections:
 
 ### Overall Safety Summary
 
-Briefly summarize the main findings.
+Briefly summarize the main findings without adding information
+that is not contained in the supplied findings.
 
 ### Medicine Findings
 
 Explain the selected medicines, duplicate ingredients,
-and medicine-class warnings.
+and medicine-class warnings. Do not guess which medicine
+contains a duplicate ingredient unless the supplied findings
+explicitly establish that relationship.
 
 ### Herbal Findings
 
@@ -91,7 +106,6 @@ or pharmacist.
 Remember that SmartRx AI is an educational and
 decision-support platform. It does not replace professional
 medical advice.
-"""
 
     # ======================================================
     # HUGGING FACE API REQUEST
