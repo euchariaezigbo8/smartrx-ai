@@ -1,0 +1,96 @@
+Medicine,Ingredient,Category,Warning
+Panadol,Paracetamol,Pain Relief,Avoid duplicate paracetamol products
+Emzor Paracetamol,Paracetamol,Pain Relief,Avoid duplicate paracetamol products
+Boska,Paracetamol,Pain Relief,Avoid duplicate paracetamol products
+M&B Paracetamol,Paracetamol,Pain Relief,Avoid duplicate paracetamol products
+Calpol,Paracetamol,Pain Relief,Check age-appropriate dosage
+Efferalgan,Paracetamol,Pain Relief,Avoid duplicate paracetamol products
+Paracetamol 500mg,Paracetamol,Pain Relief,Avoid duplicate paracetamol products
+Paracetamol Extra,Paracetamol,Pain Relief,Check total daily paracetamol intake
+Paracetamol Suspension,Paracetamol,Pain Relief,Check age-appropriate dosage
+Paracetamol Caplets,Paracetamol,Pain Relief,Avoid duplicate paracetamol products
+Ibuprofen,Ibuprofen,NSAID,Take only as directed
+Brufen,Ibuprofen,NSAID,Take only as directed
+Nurofen,Ibuprofen,NSAID,Take only as directed
+Diclofenac,Diclofenac,NSAID,May irritate the stomach
+Voltaren,Diclofenac,NSAID,May irritate the stomach
+Ponstan,Mefenamic Acid,NSAID,Take only as directed
+Naproxen,Naproxen,NSAID,Take only as directed
+Aspirin,Aspirin,NSAID,Use cautiously with bleeding or ulcer risks
+Indocid,Indomethacin,NSAID,May cause gastrointestinal irritation
+Piroxicam,Piroxicam,NSAID,Use only as directed
+Celecoxib,Celecoxib,NSAID,Use only as directed
+Ketoprofen,Ketoprofen,NSAID,Use only as directed
+Meloxicam,Meloxicam,NSAID,Use only as directed
+Procold,Paracetamol + Chlorpheniramine,Cold and Flu,Check total paracetamol intake
+Mixagrip,Paracetamol + Phenylephrine + Chlorpheniramine,Cold and Flu,Check total paracetamol intake
+Actifed,Triprolidine + Pseudoephedrine,Cold and Flu,May cause drowsiness
+Benylin,Dextromethorphan,Cold and Flu,May cause drowsiness
+Tuxil-D,Dextromethorphan + Diphenhydramine,Cold and Flu,May cause drowsiness
+Decolgen,Paracetamol + Phenylephrine + Chlorpheniramine,Cold and Flu,Check total paracetamol intake
+Amatem,Artemether + Lumefantrine,Antimalarial,Complete prescribed course
+Lonart,Artemether + Lumefantrine,Antimalarial,Complete prescribed course
+Coartem,Artemether + Lumefantrine,Antimalarial,Complete prescribed course
+P-Alaxin,Dihydroartemisinin + Piperaquine,Antimalarial,Complete prescribed course
+Maldox,Sulfadoxine + Pyrimethamine,Antimalarial,Use only as directed
+Artemether Injection,Artemether,Antimalarial,Administer only under appropriate medical supervision
+Quinine,Quinine,Antimalarial,Use only as directed
+Chloroquine,Chloroquine,Antimalarial,Use only as directed
+Fansidar,Sulfadoxine + Pyrimethamine,Antimalarial,Use only as directed
+Flagyl,Metronidazole,Antibiotic,Follow prescribed course
+Metrogyl,Metronidazole,Antibiotic,Follow prescribed course
+Amoxicillin,Amoxicillin,Antibiotic,Complete prescribed course
+Ampiclox,Ampicillin + Cloxacillin,Antibiotic,Complete prescribed course
+Augmentin,Amoxicillin + Clavulanate,Antibiotic,Complete prescribed course
+Ciprofloxacin,Ciprofloxacin,Antibiotic,Complete prescribed course
+Azithromycin,Azithromycin,Antibiotic,Complete prescribed course
+Doxycycline,Doxycycline,Antibiotic,Use only as directed
+Tetracycline,Tetracycline,Antibiotic,Use only as directed
+Septrin,Trimethoprim + Sulfamethoxazole,Antibiotic,Complete prescribed course
+Clindamycin,Clindamycin,Antibiotic,Complete prescribed course
+Erythromycin,Erythromycin,Antibiotic,Complete prescribed course
+Cephalexin,Cephalexin,Antibiotic,Complete prescribed course
+Cefuroxime,Cefuroxime,Antibiotic,Complete prescribed course
+Ceftriaxone,Ceftriaxone,Antibiotic,Use under medical supervision
+Gentamicin,Gentamicin,Antibiotic,Use under medical supervision
+Metronidazole 400mg,Metronidazole,Antibiotic,Follow prescribed course
+Omeprazole,Omeprazole,Gastrointestinal,Take as directed
+Esomeprazole,Esomeprazole,Gastrointestinal,Take as directed
+Gaviscon,Sodium Alginate,Gastrointestinal,For symptomatic relief
+Gestid,Antacid,Gastrointestinal,For symptomatic relief
+Andrews Liver Salt,Antacid,Gastrointestinal,For symptomatic relief
+Loperamide,Loperamide,Diarrhoea,Do not exceed recommended dose
+ORS,Oral Rehydration Salts,Diarrhoea,Use as directed
+Domperidone,Domperidone,Antiemetic,Use only as directed
+Motilium,Domperidone,Antiemetic,Use only as directed
+Buscopan,Hyoscine Butylbromide,Antispasmodic,Use only as directed
+Cetirizine,Cetirizine,Antihistamine,May cause drowsiness
+Loratadine,Loratadine,Antihistamine,Usually less sedating than some antihistamines
+Piriton,Chlorpheniramine,Antihistamine,May cause drowsiness
+Chlorpheniramine,Chlorpheniramine,Antihistamine,May cause drowsiness
+Fexofenadine,Fexofenadine,Antihistamine,Use as directed
+Levocetirizine,Levocetirizine,Antihistamine,May cause drowsiness
+Strepsils,Amylmetacresol + Dichlorobenzyl Alcohol,Throat Relief,Use as directed
+Vitamin C,Ascorbic Acid,Supplement,Use as directed
+Zinc,Zinc Sulphate,Supplement,Use as directed
+Wellman,Multivitamin,Supplement,Use as directed
+Wellwoman,Multivitamin,Supplement,Use as directed
+Immunace,Multivitamin,Supplement,Use as directed
+Reload,Multivitamin,Supplement,Use as directed
+Feroglobin,Iron Supplement,Supplement,Use as directed
+Folic Acid,Folic Acid,Supplement,Use as directed
+Vitamin D,Vitamin D,Supplement,Use as directed
+Calcium,Calcium Carbonate,Supplement,Use as directed
+Magnesium,Magnesium Supplement,Supplement,Use as directed
+Ferrous Sulphate,Ferrous Sulphate,Supplement,Use as directed
+Multivitamin,Multivitamin,Supplement,Use as directed
+Amlodipine,Amlodipine,Antihypertensive,Use only as prescribed
+Losartan,Losartan,Antihypertensive,Use only as prescribed
+Lisinopril,Lisinopril,Antihypertensive,Use only as prescribed
+Hydrochlorothiazide,Hydrochlorothiazide,Antihypertensive,Use only as prescribed
+Atorvastatin,Atorvastatin,Lipid Lowering,Use only as prescribed
+Metformin,Metformin,Antidiabetic,Use only as prescribed
+Glibenclamide,Glibenclamide,Antidiabetic,Use only as prescribed
+Salbutamol,Salbutamol,Respiratory,Use as directed
+Beclometasone,Beclometasone,Respiratory,Use as directed
+Prednisolone,Prednisolone,Corticosteroid,Use only as prescribed
