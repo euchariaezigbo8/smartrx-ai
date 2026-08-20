@@ -1,4 +1,19 @@
 import streamlit as st
+import pandas as pd
+
+# ==========================================================
+# LOAD MEDICATION DATABASE
+# ==========================================================
+
+try:
+    medicines_df = pd.read_csv("medicines.csv")
+except FileNotFoundError:
+    st.error("medicines.csv not found. Please make sure it is in the same repository folder as app.py.")
+    st.stop()
+
+medicine_list = sorted(
+    medicines_df["Medicine"].dropna().unique().tolist()
+)
 
 # ==========================================================
 # SMART RX AI — PAGE CONFIGURATION
