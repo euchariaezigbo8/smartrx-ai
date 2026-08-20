@@ -557,7 +557,7 @@ elif page == "🔍 AI Safety Checker":
                 .tolist()
             )
 
-            category_warnings = []
+                        category_warnings = []
 
             if categories.count("NSAID") > 1:
 
@@ -567,7 +567,7 @@ elif page == "🔍 AI Safety Checker":
                     "of stomach irritation and bleeding."
                 )
 
-                        # ==================================================
+            # ==================================================
             # HERBAL SAFETY INFORMATION
             # ==================================================
 
@@ -579,33 +579,24 @@ elif page == "🔍 AI Safety Checker":
 
             for _, herb_row in selected_herb_data.iterrows():
 
-                scientific = (
-                    herb_row.get("Scientific_Name")
-                    or herb_row.get("Scientific Name")
-                    or "Not available"
-                )
-
-                traditional = (
-                    herb_row.get("Traditional_Use")
-                    or herb_row.get("Traditional Use")
-                    or "Not available"
-                )
-
-                warning = (
-                    herb_row.get("Warning")
-                    or herb_row.get("Safety Information")
-                    or "No safety information available."
-                )
-
                 herbal_findings.append(
                     {
                         "herb": herb_row["Herb"],
-                        "scientific_name": scientific,
-                        "traditional_use": traditional,
-                        "warning": warning
+                        "scientific_name": herb_row["Scientific"],
+                        "traditional_use": (
+                            f'{herb_row["English"]} • '
+                            f'Yoruba: {herb_row["Yoruba"]} • '
+                            f'Hausa: {herb_row["Hausa"]} • '
+                            f'Igbo: {herb_row["Igbo"]}'
+                        ),
+                        "warning": (
+                            f'Risk Level: {herb_row["Risk"]} '
+                            f'({herb_row["Category"]})'
+                        )
                     }
                 )
-                        # ==================================================
+
+            # ==================================================
             # STRUCTURED SAFETY FINDINGS
             # ==================================================
 
@@ -622,7 +613,6 @@ elif page == "🔍 AI Safety Checker":
                 ],
                 "selected_herbs": herbal_findings
             }
-
             # ==================================================
             # DISPLAY STRUCTURED FINDINGS
             # ==================================================
