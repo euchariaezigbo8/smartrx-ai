@@ -223,11 +223,11 @@ if page == "🏠 Home":
         st.markdown("""
         <div class="card">
 
-        <h3>🤖 Meta Llama AI</h3>
+        <h3>🤖 Meta AI Intelligence</h3>
 
         <p>
-        Generate explainable AI safety summaries from structured
-        medication and herbal screening results.
+        Use Meta AI intelligence to generate explainable safety
+        summaries from structured medication and herbal screening results.
         </p>
 
         </div>
@@ -284,7 +284,7 @@ elif page == "ℹ️ About":
     </p>
 
     <p>
-    SmartRx AI is designed to use <strong>Meta Llama</strong>
+    SmartRx AI is designed to use <strong>Meta AI models</strong>
     as an AI intelligence and explanation layer, helping transform
     structured safety findings into understandable information
     for users.
@@ -305,7 +305,7 @@ elif page == "ℹ️ About":
     <p>🔬 Active ingredient analysis</p>
     <p>⚠️ Medication duplication screening</p>
     <p>🌿 Herb–drug safety screening</p>
-    <p>🤖 Meta Llama-powered explanations</p>
+    <p>🤖 Meta AI-powered explanations</p>
     <p>🇳🇬 Nigerian-focused health innovation</p>
 
     </div>
@@ -350,7 +350,7 @@ elif page == "📘 How To Use":
         ),
         (
             "Step 5 — Read the AI Explanation",
-            "The Meta Llama AI layer will explain the structured "
+            "The Meta AI layer will explain the structured "
             "findings in clearer, user-friendly language."
         ),
         (
@@ -414,11 +414,11 @@ elif page == "🔍 AI Safety Checker":
     <div class="ai-box">
 
     <h3 style="color:#4338CA;">
-    🤖 Meta Llama AI Layer
+    🤖 Meta AI Intelligence Layer
     </h3>
 
     <p>
-    SmartRx AI will use Meta Llama to transform structured
+    SmartRx AI will use Meta AI intelligence to transform structured
     medication-safety findings into clear, explainable summaries.
     </p>
 
