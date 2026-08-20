@@ -1,241 +1,174 @@
-import os
-import requests
 import streamlit as st
+from huggingface_hub import InferenceClient
 
 
 # ==========================================================
-# SMART RX AI — META AI ENGINE
+# SMART RX AI — META LLAMA AI ENGINE
 # ==========================================================
 
 def generate_ai_explanation(safety_findings):
 
     """
-    Generates an explainable medication and herbal safety
-    summary using a Meta model through Hugging Face.
+    Generates an explainable safety summary for SmartRx AI
+    using Meta's Llama 3.1 8B Instruct model through
+    Hugging Face Inference Providers.
+
+    The Hugging Face token is stored securely in
+    Streamlit Secrets as HF_TOKEN.
     """
 
-    # ------------------------------------------------------
-    # GET HUGGING FACE TOKEN
-    # ------------------------------------------------------
+    # ======================================================
+    # LOAD HUGGING FACE TOKEN
+    # ======================================================
 
     try:
-        hf_token = st.secrets.get("HF_TOKEN")
+        hf_token = st.secrets["HF_TOKEN"]
     except Exception:
         hf_token = None
 
     if not hf_token:
-        hf_token = os.getenv("HF_TOKEN")
-
-    if not hf_token:
         return (
-            "🤖 AI explanation is currently unavailable.\n\n"
-            "The Hugging Face token was not detected. "
-            "The structured SmartRx AI safety screening "
-            "has still been completed."
+            "🤖 The AI explanation service is not connected.\n\n"
+            "Please make sure the HF_TOKEN secret has been "
+            "added to Streamlit Cloud."
         )
 
-    # ------------------------------------------------------
-    # PREPARE FINDINGS
-    # ------------------------------------------------------
-
-    selected_medicines = safety_findings.get(
-        "selected_medicines",
-        []
-    )
-
-    duplicates = safety_findings.get(
-        "duplicate_active_ingredients",
-        []
-    )
-
-    category_warnings = safety_findings.get(
-        "category_warnings",
-        []
-    )
-
-    medicine_warnings = safety_findings.get(
-        "medicine_warnings",
-        []
-    )
-
-    selected_herbs = safety_findings.get(
-        "selected_herbs",
-        []
-    )
-
-    # ------------------------------------------------------
-    # CREATE AI PROMPT
-    # ------------------------------------------------------
+    # ======================================================
+    # AI PROMPT
+    # ======================================================
 
     prompt = f"""
 You are the AI explanation layer of SmartRx AI,
 a Nigerian medication and herbal safety intelligence platform.
 
-Explain the structured safety findings below in clear,
-simple language.
+SmartRx AI has already performed structured safety screening.
+Your job is ONLY to explain the findings supplied below.
 
-DO NOT diagnose the user.
+Do not invent information.
 
-DO NOT prescribe medicines.
+STRUCTURED SMART RX AI FINDINGS:
 
-DO NOT tell the user to start, stop or change medication.
+{safety_findings}
 
-DO NOT invent drug-herb interactions.
+IMPORTANT SAFETY RULES:
 
-Only discuss information contained in the supplied findings.
+- Do not diagnose the user.
+- Do not prescribe medicines.
+- Do not tell the user to start, stop, or change medication.
+- Do not invent medicine-herb interactions.
+- Do not invent herbal benefits or medical claims.
+- Explain only information contained in the structured findings.
+- Clearly identify duplicate active ingredients when present.
+- Clearly explain medicine-class warnings when present.
+- Explain the listed herbal scientific names and traditional names.
+- Explain the safety cautions stored in the SmartRx database.
+- If the database does not establish a specific herb-drug interaction,
+  say that the available database does not establish one.
+- Use simple language suitable for a general Nigerian audience.
+- If a potential safety concern exists, recommend consultation with
+  a qualified doctor or pharmacist.
 
-SELECTED MEDICINES:
-{selected_medicines}
+Respond using these sections:
 
-DUPLICATE ACTIVE INGREDIENTS:
-{duplicates}
+### Overall Safety Summary
 
-MEDICINE CATEGORY WARNINGS:
-{category_warnings}
+Give a short summary of the main safety findings.
 
-MEDICINE WARNINGS:
-{medicine_warnings}
+### Medicine Findings
 
-SELECTED HERBS:
-{selected_herbs}
+Explain the selected medicines, duplicate active ingredients,
+and medicine-class warnings if present.
 
-Write the response using these sections:
+### Herbal Findings
 
-Overall Safety Summary
+Explain the selected herbs, their scientific names,
+traditional Nigerian names, and the safety cautions
+contained in the SmartRx database.
 
-Medicine Findings
+### Important Safety Advice
 
-Herbal Findings
+Give concise safety advice based ONLY on the supplied findings.
 
-Important Safety Advice
+### Professional Guidance
 
-Professional Guidance
+Explain when the user should consult a doctor or pharmacist.
 
-If information about an herb is missing, clearly say that
-the SmartRx AI database does not currently contain that
-information.
+Remember:
 
-If no herb-drug interaction is established in the supplied
-data, do not invent one.
-
-SmartRx AI is an educational and decision-support platform
-and does not replace a qualified doctor or pharmacist.
+SmartRx AI is an educational and decision-support platform.
+It does not replace professional medical advice.
 """
 
-    # ------------------------------------------------------
-    # SEND REQUEST TO HUGGING FACE
-    # ------------------------------------------------------
+    # ======================================================
+    # CONNECT TO META LLAMA THROUGH HUGGING FACE
+    # ======================================================
 
     try:
 
-        response = requests.post(
-            "https://router.huggingface.co/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {hf_token}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "meta-models/Muse-Glimmer-30B:together",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                "temperature": 0.2,
-                "max_tokens": 700
-            },
-            timeout=90
+        client = InferenceClient(
+            api_key=hf_token
         )
 
-        # --------------------------------------------------
-        # CHECK HTTP RESPONSE
-        # --------------------------------------------------
+        response = client.chat.completions.create(
 
-        if response.status_code != 200:
+            model="meta-llama/Llama-3.1-8B-Instruct",
 
-            return (
-                "🤖 The AI service could not process the "
-                "request at this time.\n\n"
-                f"Service response: HTTP "
-                f"{response.status_code}\n\n"
-                "The structured SmartRx AI safety screening "
-                "has still been completed."
-            )
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are the safe and explainable AI "
+                        "intelligence layer of SmartRx AI."
+                    )
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
 
-        # --------------------------------------------------
-        # READ RESPONSE
-        # --------------------------------------------------
+            temperature=0.2,
 
-        result = response.json()
+            max_tokens=700
+        )
 
-        # --------------------------------------------------
-        # EXTRACT AI TEXT
-        # --------------------------------------------------
+        # ==================================================
+        # EXTRACT RESPONSE
+        # ==================================================
 
-        choices = result.get("choices", [])
+        if response and response.choices:
 
-        if choices:
+            content = response.choices[0].message.content
 
-            message = choices[0].get(
-                "message",
-                {}
-            )
-
-            content = message.get(
-                "content",
-                ""
-            )
-
-            if isinstance(content, str) and content.strip():
+            if content:
 
                 return content.strip()
 
-        # --------------------------------------------------
-        # UNEXPECTED RESPONSE
-        # --------------------------------------------------
-
         return (
-            "🤖 The AI service returned an unexpected "
-            "response.\n\n"
+            "🤖 The AI model returned an empty response.\n\n"
             "The structured SmartRx AI safety screening "
             "has still been completed."
         )
 
-    # ------------------------------------------------------
-    # TIMEOUT
-    # ------------------------------------------------------
-
-    except requests.exceptions.Timeout:
-
-        return (
-            "🤖 The AI service timed out.\n\n"
-            "Please try the verification again. "
-            "The structured SmartRx AI safety screening "
-            "has still been completed."
-        )
-
-    # ------------------------------------------------------
-    # CONNECTION ERROR
-    # ------------------------------------------------------
-
-    except requests.exceptions.RequestException:
-
-        return (
-            "🤖 SmartRx AI could not connect to the AI service.\n\n"
-            "The structured safety screening has still "
-            "been completed."
-        )
-
-    # ------------------------------------------------------
-    # OTHER ERROR
-    # ------------------------------------------------------
+    # ======================================================
+    # HANDLE AUTHENTICATION ERRORS
+    # ======================================================
 
     except Exception as error:
 
+        error_message = str(error)
+
+        # Do not expose the Hugging Face token
+        if hf_token in error_message:
+            error_message = error_message.replace(
+                hf_token,
+                "[HIDDEN]"
+            )
+
         return (
-            "🤖 The AI explanation service encountered "
-            "an unexpected error.\n\n"
+            "🤖 The AI explanation service could not "
+            "complete the request.\n\n"
+            f"Technical information: {error_message}\n\n"
             "The structured SmartRx AI safety screening "
             "has still been completed."
         )
