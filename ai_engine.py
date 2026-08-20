@@ -1,3 +1,4 @@
+```python
 import os
 import requests
 
@@ -9,24 +10,34 @@ import requests
 def generate_ai_explanation(safety_findings):
 
     """
-    Sends structured SmartRx AI safety findings
-    to Meta's Muse Glimmer model through
-    Hugging Face Inference Providers.
+    Generates an explainable safety summary using
+    Meta's Muse Glimmer model through Hugging Face
+    Inference Providers.
 
-    The Hugging Face token is stored securely
-    and is never placed inside the repository.
+    The Hugging Face token is stored securely as
+    HF_TOKEN in Streamlit Secrets and is never
+    included in the repository.
     """
+
+    # ======================================================
+    # LOAD HUGGING FACE TOKEN
+    # ======================================================
 
     hf_token = os.getenv("HF_TOKEN")
 
     if not hf_token:
         return (
             "🤖 AI explanation is currently unavailable.\n\n"
+            "The Hugging Face AI token has not been detected. "
             "The structured SmartRx AI safety screening "
             "has still been completed."
         )
 
-        prompt = f"""
+    # ======================================================
+    # AI PROMPT
+    # ======================================================
+
+    prompt = f"""
 You are the AI intelligence layer of SmartRx AI,
 a Nigerian medication and herbal safety intelligence platform.
 
@@ -63,7 +74,7 @@ IMPORTANT SAFETY RULES:
 - Recommend consultation with a qualified doctor or pharmacist
   when a potential safety concern is identified.
 
-STRUCTURED SMARTRX AI FINDINGS:
+STRUCTURED SMART RX AI FINDINGS:
 
 {safety_findings}
 
@@ -95,38 +106,99 @@ professional.
 Remember: SmartRx AI is a decision-support and educational
 platform. It does not replace professional medical advice.
 """
+
+    # ======================================================
+    # HUGGING FACE INFERENCE REQUEST
+    # ======================================================
+
     try:
 
         response = requests.post(
             "https://router.huggingface.co/v1/chat/completions",
+
             headers={
                 "Authorization": f"Bearer {hf_token}",
                 "Content-Type": "application/json"
             },
+
             json={
                 "model": "meta-models/Muse-Glimmer-30B:together",
+
                 "messages": [
                     {
                         "role": "user",
                         "content": prompt
                     }
                 ],
+
                 "temperature": 0.2,
                 "max_tokens": 700
             },
+
             timeout=90
         )
+
+        # ==================================================
+        # HANDLE API ERRORS
+        # ==================================================
 
         response.raise_for_status()
 
         result = response.json()
 
-        return result["choices"][0]["message"]["content"]
+        # ==================================================
+        # EXTRACT AI RESPONSE
+        # ==================================================
 
-    except Exception:
+        if (
+            "choices" in result
+            and len(result["choices"]) > 0
+            and "message" in result["choices"][0]
+        ):
+
+            content = result["choices"][0]["message"].get(
+                "content",
+                ""
+            )
+
+            if content:
+                return content
+
+        return (
+            "🤖 The AI explanation service returned an "
+            "unexpected response.\n\n"
+            "The structured SmartRx AI safety screening "
+            "remains available."
+        )
+
+    # ======================================================
+    # HANDLE CONNECTION / API ERRORS
+    # ======================================================
+
+    except requests.exceptions.Timeout:
+
+        return (
+            "🤖 The AI explanation service timed out.\n\n"
+            "Please try the safety verification again. "
+            "The structured SmartRx AI safety screening "
+            "remains available."
+        )
+
+    except requests.exceptions.RequestException:
+
         return (
             "🤖 The AI explanation service is temporarily "
             "unavailable.\n\n"
             "The structured SmartRx AI safety screening "
             "remains available."
         )
+
+    except Exception:
+
+        return (
+            "🤖 The AI explanation service encountered an "
+            "unexpected error.\n\n"
+            "The structured SmartRx AI safety screening "
+            "remains available."
+        )
+```
