@@ -1,3 +1,2 @@
 streamlit
-pandas
-llama-api-client
+requests
