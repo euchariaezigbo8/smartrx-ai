@@ -4,14 +4,19 @@ import streamlit as st
 
 
 # ==========================================================
-# SMART RX AI — META MUSE GLIMMER ENGINE
+# SMART RX AI — META AI ENGINE
 # ==========================================================
 
 def generate_ai_explanation(safety_findings):
 
-    # ======================================================
+    """
+    Generates an explainable medication and herbal safety
+    summary using a Meta model through Hugging Face.
+    """
+
+    # ------------------------------------------------------
     # GET HUGGING FACE TOKEN
-    # ======================================================
+    # ------------------------------------------------------
 
     try:
         hf_token = st.secrets.get("HF_TOKEN")
@@ -25,45 +30,76 @@ def generate_ai_explanation(safety_findings):
         return (
             "🤖 AI explanation is currently unavailable.\n\n"
             "The Hugging Face token was not detected. "
-            "Please check the HF_TOKEN secret in Streamlit."
+            "The structured SmartRx AI safety screening "
+            "has still been completed."
         )
 
-    # ======================================================
-    # PREPARE AI PROMPT
-    # ======================================================
+    # ------------------------------------------------------
+    # PREPARE FINDINGS
+    # ------------------------------------------------------
+
+    selected_medicines = safety_findings.get(
+        "selected_medicines",
+        []
+    )
+
+    duplicates = safety_findings.get(
+        "duplicate_active_ingredients",
+        []
+    )
+
+    category_warnings = safety_findings.get(
+        "category_warnings",
+        []
+    )
+
+    medicine_warnings = safety_findings.get(
+        "medicine_warnings",
+        []
+    )
+
+    selected_herbs = safety_findings.get(
+        "selected_herbs",
+        []
+    )
+
+    # ------------------------------------------------------
+    # CREATE AI PROMPT
+    # ------------------------------------------------------
 
     prompt = f"""
-You are the AI intelligence layer of SmartRx AI,
+You are the AI explanation layer of SmartRx AI,
 a Nigerian medication and herbal safety intelligence platform.
 
-You are given structured safety findings produced by
-SmartRx AI's rule-based screening system.
+Explain the structured safety findings below in clear,
+simple language.
 
-Explain the findings clearly and simply.
+DO NOT diagnose the user.
 
-IMPORTANT SAFETY RULES:
+DO NOT prescribe medicines.
 
-- Do not diagnose the user.
-- Do not prescribe medicines.
-- Do not tell the user to start or stop medication.
-- Do not invent drug-herb interactions.
-- Do not invent medical facts that are not present
-  in the structured findings.
-- Explain duplicate active ingredients clearly.
-- Explain medicine-class warnings clearly.
-- Explain the herbal information supplied in the findings.
-- If herbal interaction information is unavailable,
-  clearly state that the available database does not
-  establish an interaction.
-- Recommend speaking with a qualified doctor or pharmacist
-  when a potential safety concern is identified.
-- SmartRx AI is an educational and decision-support platform.
+DO NOT tell the user to start, stop or change medication.
 
-STRUCTURED SMART RX AI FINDINGS:
+DO NOT invent drug-herb interactions.
 
-{safety_findings}
+Only discuss information contained in the supplied findings.
 
-Organize the explanation using these sections:
+SELECTED MEDICINES:
+{selected_medicines}
+
+DUPLICATE ACTIVE INGREDIENTS:
+{duplicates}
+
+MEDICINE CATEGORY WARNINGS:
+{category_warnings}
+
+MEDICINE WARNINGS:
+{medicine_warnings}
+
+SELECTED HERBS:
+{selected_herbs}
+
+Write the response using these sections:
 
 Overall Safety Summary
 
@@ -75,12 +111,20 @@ Important Safety Advice
 
 Professional Guidance
 
-Use simple language suitable for a general Nigerian audience.
+If information about an herb is missing, clearly say that
+the SmartRx AI database does not currently contain that
+information.
+
+If no herb-drug interaction is established in the supplied
+data, do not invent one.
+
+SmartRx AI is an educational and decision-support platform
+and does not replace a qualified doctor or pharmacist.
 """
 
-    # ======================================================
+    # ------------------------------------------------------
     # SEND REQUEST TO HUGGING FACE
-    # ======================================================
+    # ------------------------------------------------------
 
     try:
 
@@ -104,69 +148,94 @@ Use simple language suitable for a general Nigerian audience.
             timeout=90
         )
 
-        # ==================================================
-        # CHECK API RESPONSE
-        # ==================================================
+        # --------------------------------------------------
+        # CHECK HTTP RESPONSE
+        # --------------------------------------------------
 
-        response.raise_for_status()
+        if response.status_code != 200:
+
+            return (
+                "🤖 The AI service could not process the "
+                "request at this time.\n\n"
+                f"Service response: HTTP "
+                f"{response.status_code}\n\n"
+                "The structured SmartRx AI safety screening "
+                "has still been completed."
+            )
+
+        # --------------------------------------------------
+        # READ RESPONSE
+        # --------------------------------------------------
 
         result = response.json()
 
-        # ==================================================
-        # EXTRACT AI MESSAGE
-        # ==================================================
+        # --------------------------------------------------
+        # EXTRACT AI TEXT
+        # --------------------------------------------------
 
-        if "choices" in result and len(result["choices"]) > 0:
+        choices = result.get("choices", [])
 
-            choice = result["choices"][0]
+        if choices:
 
-            if "message" in choice:
+            message = choices[0].get(
+                "message",
+                {}
+            )
 
-                content = choice["message"].get(
-                    "content",
-                    ""
-                )
+            content = message.get(
+                "content",
+                ""
+            )
 
-                if content:
-                    return content
+            if isinstance(content, str) and content.strip():
+
+                return content.strip()
+
+        # --------------------------------------------------
+        # UNEXPECTED RESPONSE
+        # --------------------------------------------------
 
         return (
-            "🤖 The AI service returned an unexpected response.\n\n"
+            "🤖 The AI service returned an unexpected "
+            "response.\n\n"
             "The structured SmartRx AI safety screening "
             "has still been completed."
         )
 
-    # ======================================================
-    # TIMEOUT ERROR
-    # ======================================================
+    # ------------------------------------------------------
+    # TIMEOUT
+    # ------------------------------------------------------
 
     except requests.exceptions.Timeout:
 
         return (
-            "🤖 The AI explanation service timed out.\n\n"
-            "Please try the safety verification again."
+            "🤖 The AI service timed out.\n\n"
+            "Please try the verification again. "
+            "The structured SmartRx AI safety screening "
+            "has still been completed."
         )
 
-    # ======================================================
-    # API / CONNECTION ERROR
-    # ======================================================
+    # ------------------------------------------------------
+    # CONNECTION ERROR
+    # ------------------------------------------------------
 
-    except requests.exceptions.RequestException as error:
+    except requests.exceptions.RequestException:
 
         return (
-            "🤖 The AI explanation service is temporarily "
-            "unavailable.\n\n"
-            f"Connection details: {str(error)}"
+            "🤖 SmartRx AI could not connect to the AI service.\n\n"
+            "The structured safety screening has still "
+            "been completed."
         )
 
-    # ======================================================
+    # ------------------------------------------------------
     # OTHER ERROR
-    # ======================================================
+    # ------------------------------------------------------
 
     except Exception as error:
 
         return (
             "🤖 The AI explanation service encountered "
             "an unexpected error.\n\n"
-            f"Error details: {str(error)}"
+            "The structured SmartRx AI safety screening "
+            "has still been completed."
         )
