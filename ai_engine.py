@@ -7,10 +7,8 @@ from ai_engine import generate_ai_explanation
 # SMART RX AI — META MUSE GLIMMER ENGINE
 
 # ==========================================================
-
 def generate_ai_explanation(safety_findings):
-
-try:
+    try:
     hf_token = st.secrets.get(
         "HF_TOKEN",
         os.getenv("HF_TOKEN")
