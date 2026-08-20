@@ -476,18 +476,23 @@ elif page == "🔍 AI Safety Checker":
         placeholder="Search and select medicines..."
     )
 
-    # ======================================================
-    # HERBAL MEDICINE PLACEHOLDER
-    # ======================================================
+# ======================================================
+# HERBAL MEDICINE SELECTION
+# ======================================================
 
-    st.subheader("🌿 Nigerian Herbal Medicine")
+st.subheader("🌿 Nigerian Herbal Medicine")
 
-    st.info(
-        "The Nigerian herbal medicine knowledge base will be "
-        "connected in the next stage."
-    )
+st.write(
+    "Select up to four Nigerian or Traditional African "
+    "medicinal herbs for safety screening."
+)
 
-    selected_herbs = []
+selected_herbs = st.multiselect(
+    "Choose medicinal herbs",
+    herb_list,
+    max_selections=4,
+    placeholder="Search and select herbs..."
+)
 
     # ======================================================
     # SAFETY VERIFICATION
