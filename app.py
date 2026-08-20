@@ -206,26 +206,22 @@ page = st.sidebar.radio(
 
 if page == "🏠 Home":
 
-    st.markdown("""
-    <div class="hero">
+    st.markdown(
+    """
+<div class="hero">
+    <h1>💊 SmartRx AI</h1>
+    <h3>AI-Powered Medication & Herbal Safety Intelligence</h3>
 
-        <h1>
-        💊 SmartRx AI
-        </h1>
-
-        <h3>
-        AI-Powered Medication & Herbal Safety Intelligence
-        </h3>
-
-        <p>
-        SmartRx AI is an intelligent medication-safety platform
-        designed to help users understand potential risks involving
-        orthodox medicines, traditional African medicinal herbs,
-        duplicate active ingredients and medication combinations.
-        </p>
-
-    </div>
-    """, unsafe_allow_html=True)
+    <p>
+    SmartRx AI is an intelligent medication-safety platform
+    designed to help users understand potential risks involving
+    orthodox medicines, traditional African medicinal herbs,
+    duplicate active ingredients and medication combinations.
+    </p>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
     col1, col2, col3 = st.columns(3)
 
