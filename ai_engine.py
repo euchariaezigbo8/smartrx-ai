@@ -2,10 +2,20 @@ import os
 import requests
 import streamlit as st
 
+# ==========================================================
+
+# SMART RX AI — META MUSE GLIMMER ENGINE
+
+# ==========================================================
+
 def generate_ai_explanation(safety_findings):
 
+```
 try:
-    hf_token = st.secrets.get("HF_TOKEN", os.getenv("HF_TOKEN"))
+    hf_token = st.secrets.get(
+        "HF_TOKEN",
+        os.getenv("HF_TOKEN")
+    )
 except Exception:
     hf_token = os.getenv("HF_TOKEN")
 
@@ -18,6 +28,7 @@ if not hf_token:
     )
 
 prompt = f"""
+```
 
 You are the AI intelligence layer of SmartRx AI,
 a Nigerian medication and herbal safety intelligence platform.
@@ -56,8 +67,8 @@ SmartRx AI is an educational and decision-support platform.
 It does not replace professional medical advice.
 """
 
+```
 try:
-
     response = requests.post(
         "https://router.huggingface.co/v1/chat/completions",
         headers={
@@ -99,7 +110,6 @@ try:
     )
 
 except requests.exceptions.Timeout:
-
     return (
         "🤖 The AI explanation service timed out.\n\n"
         "Please try the safety verification again. "
@@ -108,7 +118,6 @@ except requests.exceptions.Timeout:
     )
 
 except requests.exceptions.RequestException:
-
     return (
         "🤖 The AI explanation service is temporarily "
         "unavailable.\n\n"
@@ -117,7 +126,6 @@ except requests.exceptions.RequestException:
     )
 
 except Exception:
-
     return (
         "🤖 The AI explanation service encountered an "
         "unexpected error.\n\n"
