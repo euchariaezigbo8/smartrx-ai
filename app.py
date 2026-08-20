@@ -708,7 +708,7 @@ elif page == "🔍 AI Safety Checker":
                 <div class="ai-box">
 
                 <h3 style="color:#4338CA;">
-                🤖 Muse Glimmer AI Explanation
+                🤖 Meta AI Safety Explanation
                 </h3>
 
                 </div>
