@@ -3,6 +3,16 @@ import pandas as pd
 from ai_engine import generate_ai_explanation
 
 # ==========================================================
+# SMART RX AI — PAGE CONFIGURATION
+# ==========================================================
+
+st.set_page_config(
+    page_title="SmartRx AI",
+    page_icon="💊",
+    layout="wide"
+)
+
+# ==========================================================
 # LOAD HERBAL MEDICINE DATABASE
 # ==========================================================
 
@@ -17,33 +27,6 @@ except FileNotFoundError:
 
 herb_list = sorted(
     herbs_df["Herb"].dropna().unique().tolist()
-)
-
-# ==========================================================
-# LOAD MEDICATION DATABASE
-# ==========================================================
-
-try:
-    medicines_df = pd.read_csv("medicines.csv")
-except FileNotFoundError:
-    st.error(
-        "medicines.csv not found. Please make sure it is "
-        "in the same repository folder as app.py."
-    )
-    st.stop()
-
-medicine_list = sorted(
-    medicines_df["Medicine"].dropna().unique().tolist()
-)
-
-# ==========================================================
-# SMART RX AI — PAGE CONFIGURATION
-# ==========================================================
-
-st.set_page_config(
-    page_title="SmartRx AI",
-    page_icon="💊",
-    layout="wide"
 )
 
 # ==========================================================
@@ -98,6 +81,12 @@ footer {
     border-left: 10px solid #F9CC48;
     margin-bottom: 20px;
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.20);
+}
+
+.hero h1,
+.hero h3,
+.hero p {
+    color: white !important;
 }
 
 /* ======================================================
@@ -218,76 +207,77 @@ page = st.sidebar.radio(
 if page == "🏠 Home":
 
     st.markdown("""
-<div class="hero">
+    <div class="hero">
 
-    <h1 style="color:white;">
-    💊 SmartRx AI
-    </h1>
+        <h1>
+        💊 SmartRx AI
+        </h1>
 
-    <h3 style="color:white;">
-    AI-Powered Medication & Herbal Safety Intelligence
-    </h3>
+        <h3>
+        AI-Powered Medication & Herbal Safety Intelligence
+        </h3>
 
-    <p>
-    SmartRx AI is an intelligent medication-safety platform
-    designed to help users understand potential risks involving
-    orthodox medicines, traditional African medicinal herbs,
-    duplicate active ingredients and medication combinations.
-    </p>
+        <p>
+        SmartRx AI is an intelligent medication-safety platform
+        designed to help users understand potential risks involving
+        orthodox medicines, traditional African medicinal herbs,
+        duplicate active ingredients and medication combinations.
+        </p>
 
-</div>
-""", unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
 
         st.markdown("""
-<div class="card">
+        <div class="card">
 
-    <h3>💊 Medication Intelligence</h3>
+        <h3>💊 Medication Intelligence</h3>
 
-    <p>
-    Analyse multiple medicines and identify duplicate
-    active ingredients and potential medication conflicts.
-    </p>
+        <p>
+        Analyse multiple medicines and identify duplicate
+        active ingredients and potential medication conflicts.
+        </p>
 
-</div>
-""", unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
     with col2:
 
         st.markdown("""
-<div class="card">
+        <div class="card">
 
-    <h3>🌿 Herbal Intelligence</h3>
+        <h3>🌿 Herbal Intelligence</h3>
 
-    <p>
-    Cross-reference Nigerian traditional medicinal herbs
-    with pharmaceutical medicines using an ethnobotanical
-    safety knowledge base.
-    </p>
+        <p>
+        Cross-reference Nigerian traditional medicinal herbs
+        with pharmaceutical medicines using an ethnobotanical
+        safety knowledge base.
+        </p>
 
-</div>
-""", unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
     with col3:
 
         st.markdown("""
-<div class="card">
+        <div class="card">
 
-    <h3>🤖 Meta AI Intelligence</h3>
+        <h3>🤖 Meta AI Intelligence</h3>
 
-    <p>
-    Use Meta AI intelligence to generate explainable safety
-    summaries from structured medication and herbal screening results.
-    </p>
+        <p>
+        Use Meta AI intelligence to generate explainable safety
+        summaries from structured medication and herbal screening
+        results.
+        </p>
 
-</div>
-""", unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("""
-<div class="section">
+    <div class="section">
 
     <h2 style="color:#4338CA;">
     Why SmartRx AI?
@@ -305,9 +295,10 @@ if page == "🏠 Home":
     provide clearer safety information for users.
     </p>
 
-</div>
-""", unsafe_allow_html=True)
-    
+    </div>
+    """, unsafe_allow_html=True)
+
+
 # ==========================================================
 # ABOUT PAGE
 # ==========================================================
@@ -336,8 +327,8 @@ elif page == "ℹ️ About":
     </p>
 
     <p>
-    SmartRx AI is designed to use <strong>Meta AI models</strong>
-    as an AI intelligence and explanation layer, helping transform
+    SmartRx AI uses <strong>Meta AI models</strong> as an AI
+    intelligence and explanation layer, helping transform
     structured safety findings into understandable information
     for users.
     </p>
@@ -387,7 +378,7 @@ elif page == "📘 How To Use":
         (
             "Step 2 — Select Your Herbs",
             "Select up to four Nigerian or Traditional African "
-            "medicinal herbs from the herb dropdowns."
+            "medicinal herbs from the herb selector."
         ),
         (
             "Step 3 — Run Safety Screening",
@@ -397,13 +388,12 @@ elif page == "📘 How To Use":
         (
             "Step 4 — Review Structured Findings",
             "SmartRx AI checks for duplicate active ingredients, "
-            "medicine-class conflicts and potential herb–drug "
-            "safety concerns."
+            "medicine-class conflicts and stored safety warnings."
         ),
         (
             "Step 5 — Read the AI Explanation",
-            "The Meta AI layer will explain the structured "
-            "findings in clearer, user-friendly language."
+            "The Meta AI layer explains the structured findings "
+            "in clearer, user-friendly language."
         ),
         (
             "Step 6 — Seek Professional Advice",
@@ -449,10 +439,11 @@ elif page == "🔍 AI Safety Checker":
     </h3>
 
     <p>
-    Select the medicines you want SmartRx AI to analyse.
+    Select the medicines and Nigerian or Traditional African
+    medicinal herbs you want SmartRx AI to analyse.
     The system will screen the selected medicines for
     duplicate active ingredients, medicine-class conflicts,
-    and stored safety warnings.
+    stored safety warnings and herbal safety information.
     </p>
 
     </div>
@@ -475,32 +466,32 @@ elif page == "🔍 AI Safety Checker":
         placeholder="Search and select medicines..."
     )
 
-# ======================================================
-# HERBAL MEDICINE SELECTION
-# ======================================================
+    # ======================================================
+    # HERBAL MEDICINE SELECTION
+    # ======================================================
 
-st.subheader("🌿 Nigerian Herbal Medicine")
+    st.subheader("🌿 Nigerian Herbal Medicine")
 
-st.write(
-    "Select up to four Nigerian or Traditional African "
-    "medicinal herbs for safety screening."
-)
+    st.write(
+        "Select up to four Nigerian or Traditional African "
+        "medicinal herbs for safety screening."
+    )
 
-selected_herbs = st.multiselect(
-    "Choose medicinal herbs",
-    herb_list,
-    max_selections=4,
-    placeholder="Search and select herbs..."
-)
+    selected_herbs = st.multiselect(
+        "Choose medicinal herbs",
+        herb_list,
+        max_selections=4,
+        placeholder="Search and select herbs..."
+    )
 
     # ======================================================
-# SAFETY VERIFICATION
-# ======================================================
+    # SAFETY VERIFICATION
+    # ======================================================
 
-if st.button(
-    "🤖 RUN AI SAFETY VERIFICATION",
-    use_container_width=True
-):
+    if st.button(
+        "🤖 RUN AI SAFETY VERIFICATION",
+        use_container_width=True
+    ):
 
         if not selected_medicines:
 
@@ -628,6 +619,7 @@ if st.button(
                 ],
                 "selected_herbs": herbal_findings
             }
+
             # ==================================================
             # DISPLAY STRUCTURED FINDINGS
             # ==================================================
@@ -654,7 +646,7 @@ if st.button(
                 st.markdown("""
                 <div class="warning">
 
-                <h3>⚠ Medicine Combination Warning</h3>
+                <h3>⚠️ Medicine Combination Warning</h3>
 
                 </div>
                 """, unsafe_allow_html=True)
@@ -673,7 +665,7 @@ if st.button(
                 </div>
                 """, unsafe_allow_html=True)
 
-                        # ==================================================
+            # ==================================================
             # HERBAL SAFETY FINDINGS
             # ==================================================
 
@@ -726,21 +718,19 @@ if st.button(
                 )
 
             st.markdown(
-                f"""
+                """
                 <div class="ai-box">
 
                 <h3 style="color:#4338CA;">
                 🤖 Muse Glimmer AI Explanation
                 </h3>
 
-                <p>
-                {ai_explanation}
-                </p>
-
                 </div>
                 """,
                 unsafe_allow_html=True
             )
+
+            st.write(ai_explanation)
 
             # ==================================================
             # DISCLAIMER
@@ -752,6 +742,8 @@ if st.button(
                 "not diagnose medical conditions or replace "
                 "a qualified doctor or pharmacist."
             )
+
+
 # ==========================================================
 # FOOTER
 # ==========================================================
