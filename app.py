@@ -572,7 +572,7 @@ selected_herbs = st.multiselect(
                 .tolist()
             )
 
-            category_warnings = []
+                        category_warnings = []
 
             if categories.count("NSAID") > 1:
 
@@ -580,6 +580,36 @@ selected_herbs = st.multiselect(
                     "Multiple NSAID medicines were selected. "
                     "Combining NSAIDs may increase the risk "
                     "of stomach irritation and bleeding."
+                )
+
+            # ==================================================
+            # HERBAL SAFETY INFORMATION
+            # ==================================================
+
+            selected_herb_data = herbs_df[
+                herbs_df["Herb"].isin(selected_herbs)
+            ]
+
+            herbal_findings = []
+
+            for _, herb_row in selected_herb_data.iterrows():
+
+                herbal_findings.append(
+                    {
+                        "herb": herb_row["Herb"],
+                        "scientific_name": herb_row.get(
+                            "Scientific_Name",
+                            ""
+                        ),
+                        "traditional_use": herb_row.get(
+                            "Traditional_Use",
+                            ""
+                        ),
+                        "warning": herb_row.get(
+                            "Warning",
+                            ""
+                        )
+                    }
                 )
 
             # ==================================================
@@ -597,7 +627,7 @@ selected_herbs = st.multiselect(
                     }
                     for _, row in chosen.iterrows()
                 ],
-                "selected_herbs": selected_herbs
+                "selected_herbs": herbal_findings
             }
 
             # ==================================================
@@ -644,6 +674,44 @@ selected_herbs = st.multiselect(
 
                 </div>
                 """, unsafe_allow_html=True)
+
+                        # ==================================================
+            # HERBAL SAFETY FINDINGS
+            # ==================================================
+
+            if herbal_findings:
+
+                st.subheader("🌿 Herbal Safety Findings")
+
+                for herb in herbal_findings:
+
+                    st.markdown(
+                        f"""
+                        <div class="section">
+
+                        <h3 style="color:#4338CA;">
+                        🌿 {herb["herb"]}
+                        </h3>
+
+                        <p>
+                        <strong>Scientific Name:</strong>
+                        {herb["scientific_name"]}
+                        </p>
+
+                        <p>
+                        <strong>Traditional Use:</strong>
+                        {herb["traditional_use"]}
+                        </p>
+
+                        <p>
+                        <strong>Safety Information:</strong>
+                        {herb["warning"]}
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
             # ==================================================
             # AI EXPLANATION
