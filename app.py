@@ -495,15 +495,15 @@ selected_herbs = st.multiselect(
 )
 
     # ======================================================
-    # SAFETY VERIFICATION
-    # ======================================================
+# SAFETY VERIFICATION
+# ======================================================
 
-    if st.button(
-        "🤖 RUN AI SAFETY VERIFICATION",
-        use_container_width=True
-    ):
+if st.button(
+    "🤖 RUN AI SAFETY VERIFICATION",
+    use_container_width=True
+):
 
-        if not selected_medicines:
+    if not selected_medicines:
 
             st.warning(
                 "Please select at least one medicine."
