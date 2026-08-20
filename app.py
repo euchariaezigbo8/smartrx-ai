@@ -217,7 +217,7 @@ page = st.sidebar.radio(
 
 if page == "🏠 Home":
 
-       st.markdown("""
+    st.markdown("""
 <div class="hero">
 
     <h1 style="color:white;">
@@ -243,51 +243,51 @@ if page == "🏠 Home":
     with col1:
 
         st.markdown("""
-        <div class="card">
+<div class="card">
 
-        <h3>💊 Medication Intelligence</h3>
+    <h3>💊 Medication Intelligence</h3>
 
-        <p>
-        Analyse multiple medicines and identify duplicate
-        active ingredients and potential medication conflicts.
-        </p>
+    <p>
+    Analyse multiple medicines and identify duplicate
+    active ingredients and potential medication conflicts.
+    </p>
 
-        </div>
-        """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
     with col2:
 
         st.markdown("""
-        <div class="card">
+<div class="card">
 
-        <h3>🌿 Herbal Intelligence</h3>
+    <h3>🌿 Herbal Intelligence</h3>
 
-        <p>
-        Cross-reference Nigerian traditional medicinal herbs
-        with pharmaceutical medicines using an ethnobotanical
-        safety knowledge base.
-        </p>
+    <p>
+    Cross-reference Nigerian traditional medicinal herbs
+    with pharmaceutical medicines using an ethnobotanical
+    safety knowledge base.
+    </p>
 
-        </div>
-        """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
     with col3:
 
         st.markdown("""
-        <div class="card">
+<div class="card">
 
-        <h3>🤖 Meta AI Intelligence</h3>
+    <h3>🤖 Meta AI Intelligence</h3>
 
-        <p>
-        Use Meta AI intelligence to generate explainable safety
-        summaries from structured medication and herbal screening results.
-        </p>
+    <p>
+    Use Meta AI intelligence to generate explainable safety
+    summaries from structured medication and herbal screening results.
+    </p>
 
-        </div>
-        """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="section">
+<div class="section">
 
     <h2 style="color:#4338CA;">
     Why SmartRx AI?
@@ -305,10 +305,8 @@ if page == "🏠 Home":
     provide clearer safety information for users.
     </p>
 
-    </div>
-    """, unsafe_allow_html=True)
-
-
+</div>
+""", unsafe_allow_html=True)
 # ==========================================================
 # ABOUT PAGE
 # ==========================================================
