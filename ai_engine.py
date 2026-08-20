@@ -1,8 +1,6 @@
-```python
 import os
 import requests
-
-
+import streamlit as st
 # ==========================================================
 # SMART RX AI — META MUSE GLIMMER ENGINE
 # ==========================================================
@@ -23,7 +21,7 @@ def generate_ai_explanation(safety_findings):
     # LOAD HUGGING FACE TOKEN
     # ======================================================
 
-    hf_token = os.getenv("HF_TOKEN")
+    hf_token = st.secrets.get("HF_TOKEN", os.getenv("HF_TOKEN"))
 
     if not hf_token:
         return (
