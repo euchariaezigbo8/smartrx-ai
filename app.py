@@ -211,7 +211,6 @@ if page == "🏠 Home":
 <div class="hero">
     <h1>💊 SmartRx AI</h1>
     <h3>AI-Powered Medication & Herbal Safety Intelligence</h3>
-
     <p>
     SmartRx AI is an intelligent medication-safety platform
     designed to help users understand potential risks involving
@@ -573,31 +572,39 @@ elif page == "🔍 AI Safety Checker":
             # ==================================================
 
             selected_herb_data = herbs_df[
-                herbs_df["Herb"].isin(selected_herbs)
-            ]
+    herbs_df["Herb"].isin(selected_herbs)
+]
 
-            herbal_findings = []
+herbal_findings = []
 
-            for _, herb_row in selected_herb_data.iterrows():
+for _, herb_row in selected_herb_data.iterrows():
 
-                herbal_findings.append(
-                    {
-                        "herb": herb_row["Herb"],
-                        "scientific_name": herb_row.get(
-                            "Scientific_Name",
-                            ""
-                        ),
-                        "traditional_use": herb_row.get(
-                            "Traditional_Use",
-                            ""
-                        ),
-                        "warning": herb_row.get(
-                            "Warning",
-                            ""
-                        )
-                    }
-                )
+    scientific = (
+        herb_row.get("Scientific_Name")
+        or herb_row.get("Scientific Name")
+        or "Not available"
+    )
 
+    traditional = (
+        herb_row.get("Traditional_Use")
+        or herb_row.get("Traditional Use")
+        or "Not available"
+    )
+
+    warning = (
+        herb_row.get("Warning")
+        or herb_row.get("Safety Information")
+        or "No safety information available."
+    )
+
+    herbal_findings.append(
+        {
+            "herb": herb_row["Herb"],
+            "scientific_name": scientific,
+            "traditional_use": traditional,
+            "warning": warning,
+        }
+    )
             # ==================================================
             # STRUCTURED SAFETY FINDINGS
             # ==================================================
