@@ -551,7 +551,7 @@ elif page == "🔍 AI Safety Checker":
             # CATEGORY ANALYSIS
             # ==================================================
 
-                        categories = (
+                categories = (
                 chosen["Category"]
                 .dropna()
                 .tolist()
