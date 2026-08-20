@@ -609,7 +609,7 @@ for _, herb_row in selected_herb_data.iterrows():
             # STRUCTURED SAFETY FINDINGS
             # ==================================================
 
-            safety_findings = {
+                safety_findings = {
                 "selected_medicines": selected_medicines,
                 "duplicate_active_ingredients": duplicates,
                 "category_warnings": category_warnings,
