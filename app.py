@@ -1291,7 +1291,7 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             )
 
 
-            # ==================================================
+                        # ==================================================
             # 11. PROFESSIONAL GUIDANCE
             # ==================================================
 
@@ -1312,12 +1312,11 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                 """
             )
 
-
             # ==================================================
             # SMART RX AI DISCLAIMER
             # ==================================================
 
-                        st.markdown(
+            st.markdown(
                 """
                 #### ⚠️ SmartRx AI Disclaimer
 
