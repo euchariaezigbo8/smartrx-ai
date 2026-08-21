@@ -996,8 +996,6 @@ if not selected_herb_data.empty:
             ==
             herb_name.lower()
         ]
-
-
         for _, interaction in (
             herb_interactions.iterrows()
         ):
@@ -1009,6 +1007,101 @@ if not selected_herb_data.empty:
                 )
             ).strip()
 
+
+            risk = str(
+                interaction.get(
+                    "Risk",
+                    "Moderate"
+                )
+            ).strip()
+
+
+            evidence = interaction.get(
+                "Evidence_Note",
+                interaction.get(
+                    "Evidence",
+                    "Structured interaction information from the SmartRx AI database."
+                )
+            )
+
+
+            if pd.isna(evidence):
+
+                evidence = (
+                    "Structured interaction information "
+                    "from the SmartRx AI database."
+                )
+
+
+            affected_medicines = chosen[
+                chosen["Category"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .str.rstrip("s")
+                ==
+                drug_class
+                .lower()
+                .strip()
+                .rstrip("s")
+            ]
+
+
+            if not affected_medicines.empty:
+
+                interaction_findings.append(
+                    {
+                        "herb":
+                            herb_name,
+
+                        "drug_class":
+                            drug_class,
+
+                        "medicines":
+                            affected_medicines[
+                                "Medicine"
+                            ].tolist(),
+
+                        "scientific_name":
+                            herb_row[
+                                "Scientific"
+                            ],
+
+                        "active_compounds":
+                            herb_row[
+                                "Active_Compounds"
+                            ],
+
+                        "risk":
+                            risk,
+
+                        "evidence":
+                            str(evidence)
+                    }
+                )
+
+
+if interaction_findings:
+
+    st.markdown(
+        "### 🟡 Herb–Drug Interaction"
+    )
+
+
+    for item in interaction_findings:
+
+        st.markdown(
+            f"""
+> **{item["herb"]} + {", ".join(item["medicines"])}**
+
+**Potential pharmacological overlap detected.**
+
+- **Drug Class:** {item["drug_class"]}
+- **Major Active Compounds:** {item["active_compounds"]}
+- **Risk Level:** {item["risk"]}
+- **Evidence:** {item["evidence"]}
+            """
+        )
 
             risk = str(
                 interaction.get(
