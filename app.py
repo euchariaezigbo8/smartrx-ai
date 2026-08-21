@@ -630,14 +630,14 @@ elif page == "🔍 AI Safety Checker":
     st.subheader("💊 1. Select Your Medicines")
 
     st.write(
-        "You can select up to five medicines for safety screening."
+        "Select up to five orthodox medicines for safety screening."
     )
 
     selected_medicines = st.multiselect(
         "Choose medicines",
         medicine_list,
         max_selections=5,
-        placeholder="Search and select medicines..."
+        placeholder="Search and select up to five medicines..."
     )
 
 
@@ -654,11 +654,24 @@ elif page == "🔍 AI Safety Checker":
         "medicinal herbs for safety screening."
     )
 
-    selected_herbs = st.multiselect(
-        "Choose medicinal herbs",
-        herb_list,
-        max_selections=4,
-        placeholder="Search and select herbs..."
+    herb_slots = []
+
+    for i in range(4):
+
+        selected_herb = st.selectbox(
+            f"Herb {i + 1}",
+            [""] + herb_list,
+            key=f"herb_slot_{i}",
+            index=0
+        )
+
+        if selected_herb:
+            herb_slots.append(selected_herb)
+
+
+    # Remove duplicate herb selections
+    selected_herbs = list(
+        dict.fromkeys(herb_slots)
     )
 
 
@@ -693,30 +706,26 @@ elif page == "🔍 AI Safety Checker":
             st.subheader("📋 Selected Medicines")
 
 
-            for _, row in chosen.iterrows():
+            medicine_table = chosen[
+                [
+                    "Medicine",
+                    "Ingredient",
+                    "Category"
+                ]
+            ].rename(
+                columns={
+                    "Medicine": "Medicine",
+                    "Ingredient": "Active Ingredient",
+                    "Category": "Drug Class"
+                }
+            )
 
-                st.markdown(
-                    f"""
-                    <div class="section">
 
-                    <h4 style="color:#4338CA;">
-                    💊 {row["Medicine"]}
-                    </h4>
-
-                    <p>
-                    <strong>Active Ingredient:</strong>
-                    {row["Ingredient"]}
-                    </p>
-
-                    <p>
-                    <strong>Category:</strong>
-                    {row["Category"]}
-                    </p>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+            st.dataframe(
+                medicine_table,
+                use_container_width=True,
+                hide_index=True
+            )
 
 
             # ==================================================
@@ -733,44 +742,131 @@ elif page == "🔍 AI Safety Checker":
                 st.subheader("🌿 Selected Herbs")
 
 
-                for _, herb_row in selected_herb_data.iterrows():
+                herb_table = selected_herb_data[
+                    [
+                        "Herb",
+                        "Scientific",
+                        "Active_Compounds"
+                    ]
+                ].rename(
+                    columns={
+                        "Herb": "Herb",
+                        "Scientific": "Scientific Name",
+                        "Active_Compounds":
+                            "Major Active Compounds"
+                    }
+                )
 
-                    scientific = herb_row["Scientific"]
-                    active_compounds = herb_row["Active_Compounds"]
 
-                    if pd.isna(scientific) or not str(scientific).strip():
-                        scientific = "Not available"
+                st.dataframe(
+                    herb_table,
+                    use_container_width=True,
+                    hide_index=True
+                )
 
-                    if (
-                        pd.isna(active_compounds)
-                        or not str(active_compounds).strip()
-                    ):
-                        active_compounds = "Not available"
 
-                    st.markdown(
-                        f"""
-                        <div class="section">
+            # ==================================================
+            # SAFETY SCREENING RESULTS
+            # ==================================================
 
-                        <h4 style="color:#4338CA;">
-                        🌿 {herb_row["Herb"]}
-                        </h4>
+            st.subheader("🔬 Safety Screening Results")
 
-                        <p>
-                        <strong>Scientific Name:</strong>
-                        <em>{scientific}</em>
-                        </p>
 
-                        <p>
-                        <strong>Major Active Compounds:</strong>
-                        {active_compounds}
-                        </p>
+            # ==================================================
+            # DUPLICATE ACTIVE INGREDIENT ANALYSIS
+            # ==================================================
 
-                        </div>
-                        """,
-                        unsafe_allow_html=True
+            ingredient_count = {}
+
+            for ingredient in chosen["Ingredient"].dropna():
+
+                ingredients = [
+                    item.strip()
+                    for item in str(ingredient).split("+")
+                    if item.strip()
+                ]
+
+                for item in ingredients:
+
+                    ingredient_count[item] = (
+                        ingredient_count.get(item, 0) + 1
                     )
 
 
+            duplicates = [
+                ingredient
+                for ingredient, count
+                in ingredient_count.items()
+                if count > 1
+            ]
+
+
+            duplicate_details = []
+
+
+            for ingredient in duplicates:
+
+                medicines_with_ingredient = []
+
+                for _, medicine_row in chosen.iterrows():
+
+                    medicine_ingredients = [
+                        item.strip()
+                        for item in str(
+                            medicine_row["Ingredient"]
+                        ).split("+")
+                        if item.strip()
+                    ]
+
+                    if ingredient in medicine_ingredients:
+
+                        medicines_with_ingredient.append(
+                            medicine_row["Medicine"]
+                        )
+
+
+                duplicate_details.append(
+                    {
+                        "ingredient": ingredient,
+                        "medicines":
+                            medicines_with_ingredient
+                    }
+                )
+
+
+            # ==================================================
+            # DUPLICATE INGREDIENT DISPLAY
+            # ==================================================
+
+            if duplicates:
+
+                st.markdown(
+                    """
+                    <div class="danger">
+
+                    <h3>
+                    🚨 Duplicate Active Ingredient Detected
+                    </h3>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+
+                for duplicate_detail in duplicate_details:
+
+                    st.write(
+                        f"**Duplicate Active Ingredient: "
+                        f"{duplicate_detail['ingredient']}**"
+                    )
+
+                    st.write(
+                        "Found in: "
+                        + ", ".join(
+                            duplicate_detail["medicines"]
+                        )
+                    )
             # ==================================================
             # SAFETY SCREENING RESULTS
             # ==================================================
