@@ -829,7 +829,7 @@ elif page == "🔍 AI Safety Checker":
                 )
 
 
-            # ==================================================
+                        # ==================================================
             # AI CLINICAL SAFETY ANALYSIS
             # ==================================================
 
@@ -844,25 +844,19 @@ elif page == "🔍 AI Safety Checker":
 
             ingredient_count = {}
 
-
-            for ingredient in chosen[
-                "Ingredient"
-            ].dropna():
+            for ingredient in chosen["Ingredient"].dropna():
 
                 ingredients = [
                     item.strip()
-                    for item in str(
-                        ingredient
-                    ).split("+")
+                    for item in str(ingredient).split("+")
                     if item.strip()
                 ]
 
-
                 for item in ingredients:
 
-                    ingredient_count[item] = (
+                    ingredient_count[item.lower()] = (
                         ingredient_count.get(
-                            item,
+                            item.lower(),
                             0
                         ) + 1
                     )
@@ -879,37 +873,44 @@ elif page == "🔍 AI Safety Checker":
             duplicate_details = []
 
 
-            for ingredient in duplicates:
+            for ingredient_key in duplicates:
 
                 medicines_with_ingredient = []
 
+                display_ingredient = ingredient_key
 
                 for _, medicine_row in chosen.iterrows():
 
                     medicine_ingredients = [
                         item.strip()
                         for item in str(
-                            medicine_row[
-                                "Ingredient"
-                            ]
+                            medicine_row["Ingredient"]
                         ).split("+")
                         if item.strip()
                     ]
 
+                    for medicine_ingredient in medicine_ingredients:
 
-                    if ingredient in medicine_ingredients:
+                        if (
+                            medicine_ingredient.lower()
+                            == ingredient_key
+                        ):
 
-                        medicines_with_ingredient.append(
-                            medicine_row[
-                                "Medicine"
-                            ]
-                        )
+                            medicines_with_ingredient.append(
+                                medicine_row["Medicine"]
+                            )
+
+                            display_ingredient = (
+                                medicine_ingredient
+                            )
+
+                            break
 
 
                 duplicate_details.append(
                     {
                         "ingredient":
-                            ingredient,
+                            display_ingredient,
 
                         "medicines":
                             medicines_with_ingredient
@@ -922,7 +923,6 @@ elif page == "🔍 AI Safety Checker":
                 st.markdown(
                     "### 🔴 Duplicate Medicine Ingredient"
                 )
-
 
                 for item in duplicate_details:
 
@@ -939,6 +939,9 @@ Both medicines contain **{item["ingredient"]}**.
             # 2. MEDICINE-CLASS CONFLICT
             # ==================================================
 
+            category_warnings = []
+
+
             nsaid_medicines = chosen[
                 chosen["Category"]
                 .astype(str)
@@ -946,9 +949,6 @@ Both medicines contain **{item["ingredient"]}**.
                 .str.upper()
                 .eq("NSAID")
             ].copy()
-
-
-            category_warnings = []
 
 
             if len(nsaid_medicines) > 1:
@@ -967,7 +967,9 @@ Both medicines contain **{item["ingredient"]}**.
 
                 st.markdown(
                     f"""
-> **{" + ".join(nsaid_medicines["Medicine"].tolist())}**
+> **{" + ".join(
+    nsaid_medicines["Medicine"].tolist()
+)}**
 
 Both medicines belong to the **NSAID** class and may increase the risk of stomach irritation and bleeding.
                     """
@@ -1130,74 +1132,133 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
 
 
             # ==================================================
-            # 4. HERB–MEDICINE ACTIVE COMPOUND OVERLAP
+            # 4. POTENTIAL ACTIVE COMPOUND /
+            #    DRUG-DERIVATIVE RELATIONSHIP
             # ==================================================
 
-            compound_overlaps = []
+            compound_relationships = []
 
 
             if not selected_herb_data.empty:
 
                 for _, herb in selected_herb_data.iterrows():
 
-                    raw_compounds = str(
+                    herb_name = str(
+                        herb["Herb"]
+                    ).strip()
+
+
+                    scientific_name = str(
+                        herb["Scientific"]
+                    ).strip()
+
+
+                    herb_compounds = str(
                         herb["Active_Compounds"]
                     )
 
 
-                    compounds = [
-                        c.strip()
-                        for c in raw_compounds.split(";")
-                        if c.strip()
-                    ]
+                    # ------------------------------------------
+                    # ARTEMISIA / ARTEMISININ RELATIONSHIP
+                    # ------------------------------------------
+
+                    is_artemisia = (
+                        "artemisia annua"
+                        in scientific_name.lower()
+                    )
 
 
-                    for _, medicine in chosen.iterrows():
+                    contains_artemisinin = (
+                        "artemisinin"
+                        in herb_compounds.lower()
+                    )
 
-                        medicine_ingredient = str(
-                            medicine["Ingredient"]
-                        ).lower()
+
+                    if (
+                        is_artemisia
+                        or contains_artemisinin
+                    ):
+
+                        for _, medicine in chosen.iterrows():
+
+                            medicine_name = str(
+                                medicine["Medicine"]
+                            ).strip()
 
 
-                        for compound in compounds:
+                            medicine_ingredient = str(
+                                medicine["Ingredient"]
+                            ).strip()
+
+
+                            ingredient_lower = (
+                                medicine_ingredient.lower()
+                            )
+
 
                             if (
-                                compound.lower()
-                                in medicine_ingredient
+                                "artemether"
+                                in ingredient_lower
                             ):
 
-                                compound_overlaps.append(
+                                compound_relationships.append(
                                     {
                                         "herb":
-                                            herb["Herb"],
+                                            herb_name,
 
                                         "medicine":
-                                            medicine[
-                                                "Medicine"
-                                            ],
+                                            medicine_name,
 
-                                        "compound":
-                                            compound
+                                        "herb_compound":
+                                            "Artemisinin",
+
+                                        "medicine_compound":
+                                            "Artemether",
+
+                                        "relationship":
+                                            (
+                                                "Artemisinin is the "
+                                                "active compound associated "
+                                                "with Artemisia annua, while "
+                                                "artemether is an artemisinin "
+                                                "derivative used in "
+                                                "artemisinin-based "
+                                                "antimalarial medicines."
+                                            )
                                     }
                                 )
 
 
-            if compound_overlaps:
+                    # ------------------------------------------
+                    # OTHER VERIFIED RELATIONSHIPS CAN BE
+                    # ADDED HERE LATER.
+                    #
+                    # IMPORTANT:
+                    # We deliberately DO NOT treat a compound
+                    # such as quercetin as an automatic medicine
+                    # interaction merely because it appears in
+                    # a herb.
+                    # ------------------------------------------
+
+
+            if compound_relationships:
 
                 st.markdown(
-                    "### 🟣 Potential Active Compound Overlap"
+                    "### 🟣 Potential Active Compound / Drug-Derivative Relationship"
                 )
 
 
-                for item in compound_overlaps:
+                for item in compound_relationships:
 
                     st.markdown(
                         f"""
 > **{item["herb"]} + {item["medicine"]}**
 
-Both contain or reference the active compound **{item["compound"]}**.
+**{item["herb_compound"]}** is associated with the selected herb, while the medicine contains **{item["medicine_compound"]}**.
 
-SmartRx AI recommends professional review before combining products with overlapping bioactive compounds.
+{item["relationship"]}
+
+**Important:** This is **not a duplicate active ingredient**. SmartRx AI identifies this as a pharmacologically relevant relationship that should be reviewed before combining an Artemisia preparation with an artemisinin-based antimalarial medicine.
                         """
                     )
 
@@ -1242,7 +1303,7 @@ SmartRx AI recommends professional review before combining products with overlap
 
 
             # ==================================================
-            # HERBAL FINDINGS FOR AI
+            # HERBAL INFORMATION FOR AI
             # ==================================================
 
             herbal_findings = []
@@ -1254,42 +1315,47 @@ SmartRx AI recommends professional review before combining products with overlap
                     selected_herb_data.iterrows()
                 ):
 
-                    scientific = (
+                    scientific = str(
                         herb_row["Scientific"]
-                    )
+                    ).strip()
 
-                    active_compounds = (
+
+                    active_compounds = str(
                         herb_row["Active_Compounds"]
-                    )
+                    ).strip()
 
-                    yoruba = herb_row["Yoruba"]
 
-                    hausa = herb_row["Hausa"]
+                    yoruba = str(
+                        herb_row["Yoruba"]
+                    ).strip()
 
-                    igbo = herb_row["Igbo"]
 
-                    safety_caution = (
+                    hausa = str(
+                        herb_row["Hausa"]
+                    ).strip()
+
+
+                    igbo = str(
+                        herb_row["Igbo"]
+                    ).strip()
+
+
+                    safety_caution = str(
                         herb_row["Safety_Caution"]
-                    )
+                    ).strip()
 
 
                     if (
-                        pd.isna(scientific)
-                        or not str(
-                            scientific
-                        ).strip()
+                        not scientific
+                        or scientific.lower() == "nan"
                     ):
 
-                        scientific = (
-                            "Not available"
-                        )
+                        scientific = "Not available"
 
 
                     if (
-                        pd.isna(active_compounds)
-                        or not str(
-                            active_compounds
-                        ).strip()
+                        not active_compounds
+                        or active_compounds.lower() == "nan"
                     ):
 
                         active_compounds = (
@@ -1298,40 +1364,32 @@ SmartRx AI recommends professional review before combining products with overlap
 
 
                     if (
-                        pd.isna(yoruba)
-                        or not str(yoruba).strip()
+                        not yoruba
+                        or yoruba.lower() == "nan"
                     ):
 
-                        yoruba = (
-                            "Not available"
-                        )
+                        yoruba = "Not available"
 
 
                     if (
-                        pd.isna(hausa)
-                        or not str(hausa).strip()
+                        not hausa
+                        or hausa.lower() == "nan"
                     ):
 
-                        hausa = (
-                            "Not available"
-                        )
+                        hausa = "Not available"
 
 
                     if (
-                        pd.isna(igbo)
-                        or not str(igbo).strip()
+                        not igbo
+                        or igbo.lower() == "nan"
                     ):
 
-                        igbo = (
-                            "Not available"
-                        )
+                        igbo = "Not available"
 
 
                     if (
-                        pd.isna(safety_caution)
-                        or not str(
-                            safety_caution
-                        ).strip()
+                        not safety_caution
+                        or safety_caution.lower() == "nan"
                     ):
 
                         safety_caution = (
@@ -1374,7 +1432,7 @@ SmartRx AI recommends professional review before combining products with overlap
                 not duplicate_details
                 and len(nsaid_medicines) <= 1
                 and not interaction_findings
-                and not compound_overlaps
+                and not compound_relationships
             ):
 
                 st.markdown(
@@ -1389,8 +1447,8 @@ SmartRx AI recommends professional review before combining products with overlap
                     No duplicate active ingredients,
                     medicine-class conflicts, stored
                     herb–drug interaction flags or
-                    active compound overlaps were identified
-                    for the selected combination.
+                    verified compound relationships were
+                    identified for the selected combination.
                     </p>
 
                     </div>
@@ -1420,8 +1478,8 @@ SmartRx AI recommends professional review before combining products with overlap
                 "herb_drug_interactions":
                     interaction_findings,
 
-                "compound_overlaps":
-                    compound_overlaps,
+                "compound_relationships":
+                    compound_relationships,
 
                 "selected_herbs":
                     herbal_findings
@@ -1456,6 +1514,40 @@ SmartRx AI recommends professional review before combining products with overlap
                         "was completed, but the AI explanation "
                         "could not be generated at this time."
                     )
+
+
+            # --------------------------------------------------
+            # REMOVE OLD DUPLICATE DISPLAY SECTIONS
+            # --------------------------------------------------
+
+            # The structured findings above are now the primary
+            # clinical safety analysis. Older versions of the AI
+            # explanation sometimes repeated "Medicine Findings"
+            # and "Herbal Findings". Remove those headings from
+            # the displayed AI explanation.
+
+            if isinstance(
+                ai_explanation,
+                str
+            ):
+
+                unwanted_sections = [
+                    "Medicine Findings",
+                    "Herbal Findings"
+                ]
+
+
+                for unwanted in unwanted_sections:
+
+                    if unwanted in ai_explanation:
+
+                        ai_explanation = (
+                            ai_explanation
+                            .replace(
+                                unwanted,
+                                ""
+                            )
+                        )
 
 
             st.markdown(
@@ -1496,8 +1588,10 @@ SmartRx AI recommends professional review before combining products with overlap
                 be assumed to be safe simply because they
                 are natural.
 
-                Where a potential herb–drug interaction or
-                active compound overlap has been identified,
+                A compound relationship does not by itself
+                prove that a combination is unsafe. Where
+                SmartRx AI identifies a potential interaction
+                or pharmacologically relevant relationship,
                 discuss the relevant medicines and herbs
                 with a qualified healthcare professional.
                 """
