@@ -829,7 +829,7 @@ elif page == "🔍 AI Safety Checker":
                 )
 
 
-                        # ==================================================
+            # ==================================================
             # AI CLINICAL SAFETY ANALYSIS
             # ==================================================
 
@@ -1215,7 +1215,7 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                         }
                     )
 
-            # ==================================================
+                        # ==================================================
             # 7. NO MAJOR ISSUE
             # ==================================================
 
@@ -1236,11 +1236,9 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
 
                     <p>
                     No duplicate active ingredients,
-                    medicine-class conflicts, stored
-                    herb–drug interaction flags or
-                    active compound/drug-derivative
-                    relationships were identified for
-                    the selected combination.
+                    medicine-class conflicts or stored
+                    herb–drug interaction flags were identified
+                    for the selected combination.
                     </p>
 
                     </div>
@@ -1255,19 +1253,26 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
 
             safety_findings = {
 
-                "selected_medicines": selected_medicines,
+                "selected_medicines":
+                    selected_medicines,
 
-                "duplicate_active_ingredients": duplicate_details,
+                "duplicate_active_ingredients":
+                    duplicate_details,
 
-                "category_warnings": category_warnings,
+                "category_warnings":
+                    category_warnings,
 
-                "medicine_warnings": medicine_warnings,
+                "medicine_warnings":
+                    medicine_warnings,
 
-                "herb_drug_interactions": interaction_findings,
+                "herb_drug_interactions":
+                    interaction_findings,
 
-                "compound_relationships": compound_relationships,
+                "compound_relationships":
+                    compound_relationships,
 
-                "selected_herbs": herbal_findings
+                "selected_herbs":
+                    herbal_findings
             }
 
 
@@ -1275,10 +1280,12 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             # 9. AI SAFETY EXPLANATION
             # ==================================================
 
-            st.subheader("🤖 AI Safety Explanation")
+            st.subheader(
+                "🤖 AI Safety Explanation"
+            )
 
             with st.spinner(
-                "SmartRx AI is generating a safety explanation..."
+                "SmartRx AI is generating an explanation..."
             ):
 
                 try:
@@ -1290,17 +1297,18 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                 except Exception:
 
                     ai_explanation = (
-                        "The structured safety screening was completed, "
-                        "but the AI explanation could not be generated "
-                        "at this time."
+                        "The safety screening was completed, "
+                        "but the AI explanation could not be "
+                        "generated at this time."
                     )
+
 
             st.markdown(
                 """
                 <div class="ai-box">
 
                 <h3 style="color:#4338CA;">
-                🤖 Meta AI Safety Explanation
+                🤖 SmartRx AI Analysis
                 </h3>
 
                 </div>
@@ -1308,43 +1316,18 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                 unsafe_allow_html=True
             )
 
-            st.write(ai_explanation)
-
-
-            # ==================================================
-            # 10. IMPORTANT SAFETY ADVICE
-            # ==================================================
-
-            st.subheader("⚠️ Important Safety Advice")
-
             st.markdown(
-                """
-                Review duplicate active ingredients,
-                medicine-class conflicts and potential
-                herb–drug interactions carefully.
-
-                Herbal products should not automatically
-                be assumed to be safe simply because they
-                are natural.
-
-                A compound or drug-derivative relationship
-                does not by itself prove that a combination
-                is unsafe.
-
-                Where SmartRx AI identifies a potential
-                interaction or pharmacologically relevant
-                relationship, discuss the relevant medicines
-                and herbs with a qualified healthcare
-                professional.
-                """
+                ai_explanation
             )
 
 
-                        # ==================================================
-            # 11. PROFESSIONAL GUIDANCE
+            # ==================================================
+            # 10. PROFESSIONAL GUIDANCE
             # ==================================================
 
-            st.subheader("👨‍⚕️ Professional Guidance")
+            st.subheader(
+                "👨‍⚕️ Professional Guidance"
+            )
 
             st.markdown(
                 """
@@ -1361,8 +1344,9 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                 """
             )
 
+
             # ==================================================
-            # SMART RX AI DISCLAIMER
+            # 11. SMART RX AI DISCLAIMER
             # ==================================================
 
             st.markdown(
@@ -1381,21 +1365,22 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                 """
             )
 
-# ==========================================================
-# FOOTER
-# ==========================================================
 
-st.markdown(
-    """
-    <div class="footer">
+            # ==========================================================
+            # FOOTER
+            # ==========================================================
 
-    <strong>SmartRx AI © 2026</strong><br>
+            st.markdown(
+                """
+                <div class="footer">
 
-    AI-Powered Medication & Herbal Safety Intelligence<br>
+                <strong>SmartRx AI © 2026</strong><br><br>
 
-    Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
+                AI-Powered Medication & Herbal Safety Intelligence<br>
 
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+                Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
