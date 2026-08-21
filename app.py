@@ -779,8 +779,7 @@ elif page == "🔍 AI Safety Checker":
                     "Major Active Compounds",
                     "Safety Caution"
                 ]
-
-                                st.dataframe(
+                st.dataframe(
                     herb_table,
                     use_container_width=True,
                     hide_index=True
