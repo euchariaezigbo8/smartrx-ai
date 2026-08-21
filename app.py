@@ -1164,9 +1164,58 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                         "warning": warning
                     }
                 )
+            # ==================================================
+            # 6. HERBAL FINDINGS FOR AI
+            # ==================================================
 
+            herbal_findings = []
 
-                       # ==================================================
+            if not selected_herb_data.empty:
+
+                for _, herb_row in selected_herb_data.iterrows():
+
+                    scientific = herb_row["Scientific"]
+                    active_compounds = herb_row["Active_Compounds"]
+                    yoruba = herb_row["Yoruba"]
+                    hausa = herb_row["Hausa"]
+                    igbo = herb_row["Igbo"]
+                    safety_caution = herb_row["Safety_Caution"]
+
+                    if pd.isna(scientific) or not str(scientific).strip():
+                        scientific = "Not available"
+
+                    if pd.isna(active_compounds) or not str(active_compounds).strip():
+                        active_compounds = "Not available"
+
+                    if pd.isna(yoruba) or not str(yoruba).strip():
+                        yoruba = "Not available"
+
+                    if pd.isna(hausa) or not str(hausa).strip():
+                        hausa = "Not available"
+
+                    if pd.isna(igbo) or not str(igbo).strip():
+                        igbo = "Not available"
+
+                    if pd.isna(safety_caution) or not str(safety_caution).strip():
+                        safety_caution = "No safety caution available."
+
+                    traditional_names = (
+                        f"Yoruba: {yoruba} • "
+                        f"Hausa: {hausa} • "
+                        f"Igbo: {igbo}"
+                    )
+
+                    herbal_findings.append(
+                        {
+                            "herb": herb_row["Herb"],
+                            "scientific_name": scientific,
+                            "traditional_names": traditional_names,
+                            "active_compounds": active_compounds,
+                            "safety_caution": safety_caution
+                        }
+                    )
+
+            # ==================================================
             # 7. NO MAJOR ISSUE
             # ==================================================
 
