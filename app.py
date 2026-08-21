@@ -829,90 +829,88 @@ elif page == "🔍 AI Safety Checker":
                 )
 
 
-# ==================================================
-# AI CLINICAL SAFETY ANALYSIS
-# ==================================================
+            # ==================================================
+            # AI CLINICAL SAFETY ANALYSIS
+            # ==================================================
 
-st.subheader(
-    "🧠 AI Clinical Safety Analysis"
-)
+            st.subheader("🧠 AI Clinical Safety Analysis")
 
 
-# ==================================================
-# 1. DUPLICATE MEDICINE INGREDIENT
-# ==================================================
+            # ==================================================
+            # 1. DUPLICATE MEDICINE INGREDIENT
+            # ==================================================
 
-ingredient_count = {}
+            ingredient_count = {}
 
+            for ingredient in chosen["Ingredient"].dropna():
 
-for ingredient in chosen["Ingredient"].dropna():
+                ingredients = [
+                    item.strip()
+                    for item in str(ingredient).split("+")
+                    if item.strip()
+                ]
 
-    ingredients = [
-        item.strip()
-        for item in str(ingredient).split("+")
-        if item.strip()
-    ]
+                for item in ingredients:
 
-    for item in ingredients:
-
-        ingredient_count[item] = (
-            ingredient_count.get(item, 0) + 1
-        )
-
-
-duplicates = [
-    ingredient
-    for ingredient, count in ingredient_count.items()
-    if count > 1
-]
+                    ingredient_count[item] = (
+                        ingredient_count.get(item, 0) + 1
+                    )
 
 
-duplicate_details = []
+            duplicates = [
+                ingredient
+                for ingredient, count in ingredient_count.items()
+                if count > 1
+            ]
 
 
-for ingredient in duplicates:
-
-    medicines_with_ingredient = []
-
-    for _, medicine_row in chosen.iterrows():
-
-        medicine_ingredients = [
-            item.strip()
-            for item in str(
-                medicine_row["Ingredient"]
-            ).split("+")
-            if item.strip()
-        ]
-
-        if ingredient in medicine_ingredients:
-
-            medicines_with_ingredient.append(
-                medicine_row["Medicine"]
-            )
-
-    duplicate_details.append(
-        {
-            "ingredient": ingredient,
-            "medicines": medicines_with_ingredient
-        }
-    )
+            duplicate_details = []
 
 
-if duplicate_details:
+            for ingredient in duplicates:
 
-    st.markdown(
-        "### 🔴 Duplicate Medicine Ingredient"
-    )
+                medicines_with_ingredient = []
 
-    for item in duplicate_details:
+                for _, medicine_row in chosen.iterrows():
 
-        st.markdown(
-            f"""
+                    medicine_ingredients = [
+                        item.strip()
+                        for item in str(
+                            medicine_row["Ingredient"]
+                        ).split("+")
+                        if item.strip()
+                    ]
+
+                    if ingredient in medicine_ingredients:
+
+                        medicines_with_ingredient.append(
+                            medicine_row["Medicine"]
+                        )
+
+
+                duplicate_details.append(
+                    {
+                        "ingredient": ingredient,
+                        "medicines": medicines_with_ingredient
+                    }
+                )
+
+
+            if duplicate_details:
+
+                st.markdown(
+                    "### 🔴 Duplicate Medicine Ingredient"
+                )
+
+                for item in duplicate_details:
+
+                    st.markdown(
+                        f"""
 > **{" + ".join(item["medicines"])}**
 
 Both medicines contain **{item["ingredient"]}**.
-            """
-        )
+                        """
+                    )
 
 
 # ==================================================
