@@ -1,2 +1,2 @@
-# smartrx-ai
-AI-powered medication and herbal safety intelligence platform powered by Meta’s Muse Glimmer model to support explainable medication safety screening.
+smartrx-ai
+AI-powered medication and herbal safety intelligence platform that combines structured safety screening with Meta’s Llama 3.1 8B Instruct model to generate clear, explainable medication and herbal safety insights.
