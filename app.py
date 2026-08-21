@@ -716,86 +716,88 @@ if not duplicates and not category_warnings:
     <h3>✅ No Major Issue Detected by Current Rules</h3>
 
     </div>
-    """, unsafe_allow_html=True)
-            # ==================================================
-            # HERBAL SAFETY FINDINGS
-            # ==================================================
+""", unsafe_allow_html=True)
 
-            if herbal_findings:
+# ==================================================
+# HERBAL SAFETY FINDINGS
+# ==================================================
 
-                st.subheader("🌿 Herbal Safety Findings")
+if herbal_findings:
 
-                for herb in herbal_findings:
+    st.subheader("🌿 Herbal Safety Findings")
 
-                    st.markdown(
-                        f"""
-                        <div class="section">
+    for herb in herbal_findings:
 
-                        <h3 style="color:#4338CA;">
-                        🌿 {herb["herb"]}
-                        </h3>
+        st.markdown(
+            f"""
+            <div class="section">
 
-                        <p>
-                        <strong>Scientific Name:</strong>
-                        {herb["scientific_name"]}
-                        </p>
+            <h3 style="color:#4338CA;">
+            🌿 {herb["herb"]}
+            </h3>
 
-                        <p>
-                        <strong>Traditional Names:</strong>
-                        {herb["traditional_use"]}
-                        </p>
+            <p>
+            <strong>Scientific Name:</strong>
+            {herb["scientific_name"]}
+            </p>
 
-                        <p>
-                        <strong>Safety Caution:</strong>
-                        {herb["warning"]}
-                        </p>
+            <p>
+            <strong>Traditional Names:</strong>
+            {herb["traditional_names"]}
+            </p>
 
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+            <p>
+            <strong>Safety Caution:</strong>
+            {herb["safety_caution"]}
+            </p>
 
-            # ==================================================
-            # AI EXPLANATION
-            # ==================================================
-
-            st.subheader("🤖 AI Safety Explanation")
-
-            with st.spinner(
-                "SmartRx AI is generating a safety explanation..."
-            ):
-
-                ai_explanation = generate_ai_explanation(
-                    safety_findings
-                )
-
-            st.markdown(
-                """
-                <div class="ai-box">
-
-                <h3 style="color:#4338CA;">
-                🤖 Meta AI Safety Explanation
-                </h3>
-
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-            st.write(ai_explanation)
-
-            # ==================================================
-            # DISCLAIMER
-            # ==================================================
-
-            st.info(
-                "⚠️ SmartRx AI provides educational and "
-                "decision-support information only. It does "
-                "not diagnose medical conditions or replace "
-                "a qualified doctor or pharmacist."
-            )
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 
+# ==================================================
+# AI EXPLANATION
+# ==================================================
+
+st.subheader("🤖 AI Safety Explanation")
+
+with st.spinner(
+    "SmartRx AI is generating a safety explanation..."
+):
+
+    ai_explanation = generate_ai_explanation(
+        safety_findings
+    )
+
+
+st.markdown(
+    """
+    <div class="ai-box">
+
+    <h3 style="color:#4338CA;">
+    🤖 Meta AI Safety Explanation
+    </h3>
+
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.write(ai_explanation)
+
+
+# ==================================================
+# DISCLAIMER
+# ==================================================
+
+st.info(
+    "⚠️ SmartRx AI provides educational and "
+    "decision-support information only. It does "
+    "not diagnose medical conditions or replace "
+    "a qualified doctor or pharmacist."
+)
 # ==========================================================
 # FOOTER
 # ==========================================================
