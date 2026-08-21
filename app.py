@@ -985,30 +985,27 @@ if not selected_herb_data.empty:
         herb_name = str(herb_row["Herb"]).strip()
 
         herb_interactions = interactions_df[
-            interactions_df["Herb"]
-            .astype(str)
-            .str.strip()
-            .str.lower()
+            interactions_df["Herb"].astype(str).str.strip().str.lower()
             == herb_name.lower()
         ]
 
         for _, interaction in herb_interactions.iterrows():
 
-    drug_class = str(
-        interaction.get("Drug_Class", "")
-    ).strip()
+            drug_class = str(
+                interaction.get("Drug_Class", "")
+            ).strip()
 
-    risk = str(
-        interaction.get("Risk", "Moderate")
-    ).strip()
+            risk = str(
+                interaction.get("Risk", "Moderate")
+            ).strip()
 
-    evidence = interaction.get(
-        "Evidence_Note",
-        interaction.get(
-            "Evidence",
-            "Structured interaction information from the SmartRx AI database."
-        )
-    )
+            evidence = interaction.get(
+                "Evidence_Note",
+                interaction.get(
+                    "Evidence",
+                    "Structured interaction information from the SmartRx AI database."
+                )
+            )
 
             if pd.isna(evidence):
                 evidence = (
@@ -1049,7 +1046,7 @@ if interaction_findings:
             f"""
 > **{item["herb"]} + {", ".join(item["medicines"])}**
 
-**Potential pharmacological overlap detected**
+**Potential pharmacological overlap detected.**
 
 - **Drug Class:** {item["drug_class"]}
 - **Major Active Compounds:** {item["active_compounds"]}
