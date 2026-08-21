@@ -978,43 +978,29 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
 
 interaction_findings = []
 
-
 if not selected_herb_data.empty:
 
     for _, herb_row in selected_herb_data.iterrows():
 
-        herb_name = str(
-            herb_row["Herb"]
-        ).strip()
-
+        herb_name = str(herb_row["Herb"]).strip()
 
         herb_interactions = interactions_df[
             interactions_df["Herb"]
             .astype(str)
             .str.strip()
             .str.lower()
-            ==
-            herb_name.lower()
+            == herb_name.lower()
         ]
-        for _, interaction in (
-            herb_interactions.iterrows()
-        ):
+
+        for _, interaction in herb_interactions.iterrows():
 
             drug_class = str(
-                interaction.get(
-                    "Drug_Class",
-                    ""
-                )
+                interaction.get("Drug_Class", "")
             ).strip()
-
 
             risk = str(
-                interaction.get(
-                    "Risk",
-                    "Moderate"
-                )
+                interaction.get("Risk", "Moderate")
             ).strip()
-
 
             evidence = interaction.get(
                 "Evidence_Note",
@@ -1024,14 +1010,10 @@ if not selected_herb_data.empty:
                 )
             )
 
-
             if pd.isna(evidence):
-
                 evidence = (
-                    "Structured interaction information "
-                    "from the SmartRx AI database."
+                    "Structured interaction information from the SmartRx AI database."
                 )
-
 
             affected_medicines = chosen[
                 chosen["Category"]
@@ -1040,53 +1022,26 @@ if not selected_herb_data.empty:
                 .str.lower()
                 .str.rstrip("s")
                 ==
-                drug_class
-                .lower()
-                .strip()
-                .rstrip("s")
+                drug_class.lower().rstrip("s")
             ]
-
 
             if not affected_medicines.empty:
 
                 interaction_findings.append(
                     {
-                        "herb":
-                            herb_name,
-
-                        "drug_class":
-                            drug_class,
-
-                        "medicines":
-                            affected_medicines[
-                                "Medicine"
-                            ].tolist(),
-
-                        "scientific_name":
-                            herb_row[
-                                "Scientific"
-                            ],
-
-                        "active_compounds":
-                            herb_row[
-                                "Active_Compounds"
-                            ],
-
-                        "risk":
-                            risk,
-
-                        "evidence":
-                            str(evidence)
+                        "herb": herb_name,
+                        "drug_class": drug_class,
+                        "medicines": affected_medicines["Medicine"].tolist(),
+                        "scientific_name": herb_row["Scientific"],
+                        "active_compounds": herb_row["Active_Compounds"],
+                        "risk": risk,
+                        "evidence": str(evidence)
                     }
                 )
 
-
 if interaction_findings:
 
-    st.markdown(
-        "### 🟡 Herb–Drug Interaction"
-    )
-
+    st.markdown("### 🟡 Herb–Drug Interaction")
 
     for item in interaction_findings:
 
@@ -1094,7 +1049,7 @@ if interaction_findings:
             f"""
 > **{item["herb"]} + {", ".join(item["medicines"])}**
 
-**Potential pharmacological overlap detected.**
+**Potential pharmacological overlap detected**
 
 - **Drug Class:** {item["drug_class"]}
 - **Major Active Compounds:** {item["active_compounds"]}
