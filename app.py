@@ -1044,111 +1044,16 @@ if interaction_findings:
 
         st.markdown(
             f"""
-> **{item["herb"]} + {", ".join(item["medicines"])}**
+> **{item['herb']} + {", ".join(item['medicines'])}**
 
 **Potential pharmacological overlap detected.**
 
-- **Drug Class:** {item["drug_class"]}
-- **Major Active Compounds:** {item["active_compounds"]}
-- **Risk Level:** {item["risk"]}
-- **Evidence:** {item["evidence"]}
+- **Drug Class:** {item['drug_class']}
+- **Major Active Compounds:** {item['active_compounds']}
+- **Risk Level:** {item['risk']}
+- **Evidence:** {item['evidence']}
             """
         )
-
-            risk = str(
-                interaction.get(
-                    "Risk",
-                    "Moderate"
-                )
-            ).strip()
-
-
-            evidence = interaction.get(
-                "Evidence_Note",
-                interaction.get(
-                    "Evidence",
-                    "Structured interaction information from the SmartRx AI database."
-                )
-            )
-
-
-            if pd.isna(evidence):
-
-                evidence = (
-                    "Structured interaction information "
-                    "from the SmartRx AI database."
-                )
-
-
-            affected_medicines = chosen[
-                chosen["Category"]
-                .astype(str)
-                .str.strip()
-                .str.lower()
-                .str.rstrip("s")
-                ==
-                drug_class
-                .lower()
-                .strip()
-                .rstrip("s")
-            ]
-
-
-            if not affected_medicines.empty:
-
-                interaction_findings.append(
-                    {
-                        "herb":
-                            herb_name,
-
-                        "drug_class":
-                            drug_class,
-
-                        "medicines":
-                            affected_medicines[
-                                "Medicine"
-                            ].tolist(),
-
-                        "scientific_name":
-                            herb_row[
-                                "Scientific"
-                            ],
-
-                        "active_compounds":
-                            herb_row[
-                                "Active_Compounds"
-                            ],
-
-                        "risk":
-                            risk,
-
-                        "evidence":
-                            str(evidence)
-                    }
-                )
-
-
-if interaction_findings:
-
-    st.markdown(
-        "### 🟡 Herb–Drug Interaction"
-    )
-
-    for item in interaction_findings:
-
-        st.markdown(
-            f"""
-> **{item["herb"]} + {", ".join(item["medicines"])}**
-
-**Potential pharmacological overlap detected.**
-
-- **Drug Class:** {item["drug_class"]}
-- **Major Active Compounds:** {item["active_compounds"]}
-- **Risk Level:** {item["risk"]}
-- **Evidence:** {item["evidence"]}
-            """
-        )
-
 
 # ==================================================
 # 4. POTENTIAL ACTIVE COMPOUND /
@@ -1157,101 +1062,42 @@ if interaction_findings:
 
 compound_relationships = []
 
-
 if not selected_herb_data.empty:
 
     for _, herb in selected_herb_data.iterrows():
 
-        herb_name = str(
-            herb["Herb"]
-        ).strip()
-
-
-        scientific_name = str(
-            herb["Scientific"]
-        ).strip()
-
-
-        herb_compounds = str(
-            herb["Active_Compounds"]
-        )
-
-
-        # ------------------------------------------
-        # ARTEMISIA / ARTEMISININ RELATIONSHIP
-        # ------------------------------------------
+        herb_name = str(herb["Herb"]).strip()
+        scientific_name = str(herb["Scientific"]).strip()
+        herb_compounds = str(herb["Active_Compounds"])
 
         is_artemisia = (
-            "artemisia annua"
-            in scientific_name.lower()
+            "artemisia annua" in scientific_name.lower()
         )
-
 
         contains_artemisinin = (
-            "artemisinin"
-            in herb_compounds.lower()
+            "artemisinin" in herb_compounds.lower()
         )
 
-
-        if (
-            is_artemisia
-            or contains_artemisinin
-        ):
+        if is_artemisia or contains_artemisinin:
 
             for _, medicine in chosen.iterrows():
 
-                medicine_name = str(
-                    medicine["Medicine"]
-                ).strip()
-
-
-                medicine_ingredient = str(
+                ingredient = str(
                     medicine["Ingredient"]
-                ).strip()
+                ).lower()
 
-
-                ingredient_lower = (
-                    medicine_ingredient.lower()
-                )
-
-
-                if (
-                    "artemether"
-                    in ingredient_lower
-                ):
+                if "artemether" in ingredient:
 
                     compound_relationships.append(
                         {
-                            "herb":
-                                herb_name,
-
-                            "medicine":
-                                medicine_name,
-
-                            "herb_compound":
-                                "Artemisinin",
-
-                            "medicine_compound":
-                                "Artemether",
-
+                            "herb": herb_name,
+                            "medicine": medicine["Medicine"],
+                            "herb_compound": "Artemisinin",
+                            "medicine_compound": "Artemether",
                             "relationship":
-                                (
-                                    "Artemisinin is the "
-                                    "active compound associated "
-                                    "with Artemisia annua, while "
-                                    "artemether is an artemisinin "
-                                    "derivative used in "
-                                    "artemisinin-based "
-                                    "antimalarial medicines."
-                                )
+                                "Artemisinin is the natural compound from Artemisia annua, while artemether is its pharmaceutical derivative used in ACT medicines."
                         }
                     )
-
-
-# ==================================================
-# DISPLAY ACTIVE COMPOUND / DRUG-DERIVATIVE
-# RELATIONSHIPS
-# ==================================================
 
 if compound_relationships:
 
@@ -1263,18 +1109,13 @@ if compound_relationships:
 
         st.markdown(
             f"""
-> **{item["herb"]} + {item["medicine"]}**
+> **{item['herb']} + {item['medicine']}**
 
-**{item["herb_compound"]}** is associated with the selected herb,
-while the medicine contains **{item["medicine_compound"]}**.
+**{item['herb_compound']}** is associated with the selected herb, while the medicine contains **{item['medicine_compound']}**.
 
-{item["relationship"]}
+{item['relationship']}
 
-**Important:** This is **not a duplicate active ingredient**.
-SmartRx AI identifies this as a pharmacologically relevant
-relationship that should be reviewed before combining an
-*Artemisia* preparation with an artemisinin-based antimalarial
-medicine.
+**Important:** This is **not** a duplicate active ingredient. It is a pharmacologically relevant relationship that should be reviewed before combining an Artemisia preparation with an artemisinin-based antimalarial medicine.
             """
         )
 
