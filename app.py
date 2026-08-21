@@ -1166,262 +1166,189 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                 )
 
 
+                       # ==================================================
+            # 7. NO MAJOR ISSUE
             # ==================================================
-            # 6. HERBAL FINDINGS FOR AI
+
+            if (
+                not duplicate_details
+                and len(nsaid_medicines) <= 1
+                and not interaction_findings
+                and not compound_relationships
+            ):
+
+                st.markdown(
+                    """
+                    <div class="safe">
+
+                    <h3>
+                    ✅ No Major Issue Detected by Current Rules
+                    </h3>
+
+                    <p>
+                    No duplicate active ingredients,
+                    medicine-class conflicts, stored
+                    herb–drug interaction flags or
+                    active compound/drug-derivative
+                    relationships were identified for
+                    the selected combination.
+                    </p>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+
+            # ==================================================
+            # 8. STRUCTURED SMART RX AI FINDINGS
             # ==================================================
 
-            herbal_findings = []
+            safety_findings = {
 
-            if not selected_herb_data.empty:
+                "selected_medicines": selected_medicines,
 
-                for _, herb_row in selected_herb_data.iterrows():
+                "duplicate_active_ingredients": duplicate_details,
 
-                    scientific = herb_row["Scientific"]
-                    active_compounds = herb_row["Active_Compounds"]
-                    yoruba = herb_row["Yoruba"]
-                    hausa = herb_row["Hausa"]
-                    igbo = herb_row["Igbo"]
-                    safety_caution = herb_row["Safety_Caution"]
+                "category_warnings": category_warnings,
 
-                    if pd.isna(scientific) or not str(scientific).strip():
-                        scientific = "Not available"
+                "medicine_warnings": medicine_warnings,
 
-                    if pd.isna(active_compounds) or not str(active_compounds).strip():
-                        active_compounds = "Not available"
+                "herb_drug_interactions": interaction_findings,
 
-                    if pd.isna(yoruba) or not str(yoruba).strip():
-                        yoruba = "Not available"
+                "compound_relationships": compound_relationships,
 
-                    if pd.isna(hausa) or not str(hausa).strip():
-                        hausa = "Not available"
+                "selected_herbs": herbal_findings
+            }
 
-                    if pd.isna(igbo) or not str(igbo).strip():
-                        igbo = "Not available"
 
-                    if pd.isna(safety_caution) or not str(safety_caution).strip():
-                        safety_caution = "No safety caution available."
+            # ==================================================
+            # 9. AI SAFETY EXPLANATION
+            # ==================================================
 
-                    traditional_names = (
-                        f"Yoruba: {yoruba} • "
-                        f"Hausa: {hausa} • "
-                        f"Igbo: {igbo}"
+            st.subheader("🤖 AI Safety Explanation")
+
+            with st.spinner(
+                "SmartRx AI is generating a safety explanation..."
+            ):
+
+                try:
+
+                    ai_explanation = generate_ai_explanation(
+                        safety_findings
                     )
 
-                    herbal_findings.append(
-                        {
-                            "herb": herb_row["Herb"],
-                            "scientific_name": scientific,
-                            "traditional_names": traditional_names,
-                            "active_compounds": active_compounds,
-                            "safety_caution": safety_caution
-                        }
+                except Exception:
+
+                    ai_explanation = (
+                        "The structured safety screening was completed, "
+                        "but the AI explanation could not be generated "
+                        "at this time."
                     )
 
+            st.markdown(
+                """
+                <div class="ai-box">
 
-# ==================================================
-# 7. NO MAJOR ISSUE
-# ==================================================
+                <h3 style="color:#4338CA;">
+                🤖 Meta AI Safety Explanation
+                </h3>
 
-if (
-    not duplicate_details
-    and len(nsaid_medicines) <= 1
-    and not interaction_findings
-    and not compound_relationships
-):
-
-    st.markdown(
-        """
-        <div class="safe">
-
-        <h3>
-        ✅ No Major Issue Detected by Current Rules
-        </h3>
-
-        <p>
-        No duplicate active ingredients,
-        medicine-class conflicts, stored
-        herb–drug interaction flags or
-        active compound/drug-derivative relationships
-        were identified for the selected combination.
-        </p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-# ==================================================
-# 8. STRUCTURED SMART RX AI FINDINGS
-# ==================================================
-
-safety_findings = {
-
-    "selected_medicines":
-        selected_medicines,
-
-    "duplicate_active_ingredients":
-        duplicate_details,
-
-    "category_warnings":
-        category_warnings,
-
-    "medicine_warnings":
-        medicine_warnings,
-
-    "herb_drug_interactions":
-        interaction_findings,
-
-    "compound_relationships":
-        compound_relationships,
-
-    "selected_herbs":
-        herbal_findings
-}
-
-
-# ==================================================
-# 9. AI SAFETY EXPLANATION
-# ==================================================
-
-st.subheader(
-    "🤖 AI Safety Explanation"
-)
-
-
-with st.spinner(
-    "SmartRx AI is generating a safety explanation..."
-):
-
-    try:
-
-        ai_explanation = (
-            generate_ai_explanation(
-                safety_findings
+                </div>
+                """,
+                unsafe_allow_html=True
             )
-        )
 
-    except Exception:
-
-        ai_explanation = (
-            "The structured safety screening "
-            "was completed, but the AI explanation "
-            "could not be generated at this time."
-        )
+            st.write(ai_explanation)
 
 
-st.markdown(
-    """
-    <div class="ai-box">
+            # ==================================================
+            # 10. IMPORTANT SAFETY ADVICE
+            # ==================================================
 
-    <h3 style="color:#4338CA;">
-    🤖 Meta AI Safety Explanation
-    </h3>
+            st.subheader("⚠️ Important Safety Advice")
 
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+            st.markdown(
+                """
+                Review duplicate active ingredients,
+                medicine-class conflicts and potential
+                herb–drug interactions carefully.
 
+                Herbal products should not automatically
+                be assumed to be safe simply because they
+                are natural.
 
-st.write(
-    ai_explanation
-)
+                A compound or drug-derivative relationship
+                does not by itself prove that a combination
+                is unsafe.
 
-
-# ==================================================
-# 10. IMPORTANT SAFETY ADVICE
-# ==================================================
-
-st.subheader(
-    "⚠️ Important Safety Advice"
-)
-
-
-st.markdown(
-    """
-    Review duplicate active ingredients,
-    medicine-class conflicts and potential
-    herb–drug interactions carefully.
-
-    Herbal products should not automatically
-    be assumed to be safe simply because they
-    are natural.
-
-    A compound or drug-derivative relationship
-    does not by itself prove that a combination
-    is unsafe.
-
-    Where SmartRx AI identifies a potential
-    interaction or pharmacologically relevant
-    relationship, discuss the relevant medicines
-    and herbs with a qualified healthcare
-    professional.
-    """
-)
+                Where SmartRx AI identifies a potential
+                interaction or pharmacologically relevant
+                relationship, discuss the relevant medicines
+                and herbs with a qualified healthcare
+                professional.
+                """
+            )
 
 
-# ==================================================
-# 11. PROFESSIONAL GUIDANCE
-# ==================================================
+            # ==================================================
+            # 11. PROFESSIONAL GUIDANCE
+            # ==================================================
 
-st.subheader(
-    "👨‍⚕️ Professional Guidance"
-)
+            st.subheader("👨‍⚕️ Professional Guidance")
 
+            st.markdown(
+                """
+                SmartRx AI provides educational and
+                decision-support information.
 
-st.markdown(
-    """
-    SmartRx AI provides educational and
-    decision-support information.
+                It does not diagnose medical conditions
+                or replace a qualified doctor or pharmacist.
 
-    It does not diagnose medical conditions
-    or replace a qualified doctor or pharmacist.
-
-    Consult a qualified healthcare professional
-    for personalised medical advice before
-    starting, stopping or combining medicines
-    or herbal products.
-    """
-)
+                Consult a qualified healthcare professional
+                for personalised medical advice before
+                starting, stopping or combining medicines
+                or herbal products.
+                """
+            )
 
 
-# ==================================================
-# SMART RX AI DISCLAIMER
-# ==================================================
+            # ==================================================
+            # SMART RX AI DISCLAIMER
+            # ==================================================
 
-st.markdown(
-    """
-    #### ⚠️ SmartRx AI Disclaimer
+            st.markdown(
+                """
+                #### ⚠️ SmartRx AI Disclaimer
 
-    SmartRx AI provides educational and
-    decision-support information only.
+                SmartRx AI provides educational and
+                decision-support information only.
 
-    It is not a substitute for professional
-    medical diagnosis, treatment or advice.
+                It is not a substitute for professional
+                medical diagnosis, treatment or advice.
 
-    Always consult a qualified doctor or pharmacist
-    before making decisions about medicines or
-    herbal products.
-    """
-)
-        
+                Always consult a qualified doctor or pharmacist
+                before making decisions about medicines or
+                herbal products.
+                """
+            )
 
-# ==========================================================
-# FOOTER
-# ==========================================================
 
-st.markdown(
-    """
-    <div class="footer">
+            # ==========================================================
+            # FOOTER
+            # ==========================================================
 
-    <strong>SmartRx AI © 2026</strong><br>
+            st.markdown(
+                """
+                <div class="footer">
 
-    AI-Powered Medication & Herbal Safety Intelligence<br>
+                <strong>SmartRx AI © 2026</strong><br>
 
-    Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
+                AI-Powered Medication & Herbal Safety Intelligence<br>
 
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+                Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
