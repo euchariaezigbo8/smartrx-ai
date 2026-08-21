@@ -641,7 +641,7 @@ elif page == "🔍 AI Safety Checker":
     )
 
 
-    # ======================================================
+        # ======================================================
     # 2. SELECT HERBS
     # ======================================================
 
@@ -658,21 +658,17 @@ elif page == "🔍 AI Safety Checker":
 
     for i in range(4):
 
-        selected_herb = st.selectbox(
+        herb = st.selectbox(
             f"Herb {i + 1}",
             [""] + herb_list,
-            key=f"herb_slot_{i}",
-            index=0
+            key=f"herb_slot_{i}"
         )
 
-        if selected_herb:
-            herb_slots.append(selected_herb)
-
+        if herb:
+            herb_slots.append(herb)
 
     # Remove duplicate herb selections
-    selected_herbs = list(
-        dict.fromkeys(herb_slots)
-    )
+    selected_herbs = list(dict.fromkeys(herb_slots))
 
 
     # ======================================================
@@ -702,24 +698,25 @@ elif page == "🔍 AI Safety Checker":
                 )
             ].copy()
 
-
-            st.subheader("📋 Selected Medicines")
-
+            st.subheader(
+                "📋 Selected Medicines & Safety Screening Results"
+            )
 
             medicine_table = chosen[
                 [
                     "Medicine",
                     "Ingredient",
-                    "Category"
+                    "Category",
+                    "Warning"
                 ]
-            ].rename(
-                columns={
-                    "Medicine": "Medicine",
-                    "Ingredient": "Active Ingredient",
-                    "Category": "Drug Class"
-                }
-            )
+            ].copy()
 
+            medicine_table.columns = [
+                "Medicine",
+                "Active Ingredient",
+                "Drug Class",
+                "Safety Warning"
+            ]
 
             st.dataframe(
                 medicine_table,
@@ -733,30 +730,55 @@ elif page == "🔍 AI Safety Checker":
             # ==================================================
 
             selected_herb_data = herbs_df[
-                herbs_df["Herb"].isin(selected_herbs)
+                herbs_df["Herb"].isin(
+                    selected_herbs
+                )
             ].copy()
-
 
             if not selected_herb_data.empty:
 
-                st.subheader("🌿 Selected Herbs")
-
+                st.subheader(
+                    "🌿 Selected Herbs & Herbal Safety Summary"
+                )
 
                 herb_table = selected_herb_data[
                     [
                         "Herb",
                         "Scientific",
-                        "Active_Compounds"
+                        "Yoruba",
+                        "Hausa",
+                        "Igbo",
+                        "Active_Compounds",
+                        "Safety_Caution"
                     ]
-                ].rename(
-                    columns={
-                        "Herb": "Herb",
-                        "Scientific": "Scientific Name",
-                        "Active_Compounds":
-                            "Major Active Compounds"
-                    }
+                ].copy()
+
+                herb_table["Traditional Names"] = (
+                    "Yoruba: "
+                    + herb_table["Yoruba"].fillna("Not available")
+                    + " • Hausa: "
+                    + herb_table["Hausa"].fillna("Not available")
+                    + " • Igbo: "
+                    + herb_table["Igbo"].fillna("Not available")
                 )
 
+                herb_table = herb_table[
+                    [
+                        "Herb",
+                        "Scientific",
+                        "Traditional Names",
+                        "Active_Compounds",
+                        "Safety_Caution"
+                    ]
+                ]
+
+                herb_table.columns = [
+                    "Herb",
+                    "Scientific Name",
+                    "Traditional Names",
+                    "Major Active Compounds",
+                    "Safety Caution"
+                ]
 
                 st.dataframe(
                     herb_table,
@@ -769,7 +791,9 @@ elif page == "🔍 AI Safety Checker":
             # SAFETY SCREENING RESULTS
             # ==================================================
 
-            st.subheader("🔬 Safety Screening Results")
+            st.subheader(
+                "🔬 Safety Screening Results"
+            )
 
 
             # ==================================================
@@ -792,7 +816,6 @@ elif page == "🔍 AI Safety Checker":
                         ingredient_count.get(item, 0) + 1
                     )
 
-
             duplicates = [
                 ingredient
                 for ingredient, count
@@ -800,9 +823,7 @@ elif page == "🔍 AI Safety Checker":
                 if count > 1
             ]
 
-
             duplicate_details = []
-
 
             for ingredient in duplicates:
 
@@ -823,103 +844,6 @@ elif page == "🔍 AI Safety Checker":
                         medicines_with_ingredient.append(
                             medicine_row["Medicine"]
                         )
-
-
-                duplicate_details.append(
-                    {
-                        "ingredient": ingredient,
-                        "medicines":
-                            medicines_with_ingredient
-                    }
-                )
-
-
-            # ==================================================
-            # DUPLICATE INGREDIENT DISPLAY
-            # ==================================================
-
-            if duplicates:
-
-                st.markdown(
-                    """
-                    <div class="danger">
-
-                    <h3>
-                    🚨 Duplicate Active Ingredient Detected
-                    </h3>
-
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-
-                for duplicate_detail in duplicate_details:
-
-                    st.write(
-                        f"**Duplicate Active Ingredient: "
-                        f"{duplicate_detail['ingredient']}**"
-                    )
-
-                    st.write(
-                        "Found in: "
-                        + ", ".join(
-                            duplicate_detail["medicines"]
-                        )
-                    )
-            
-            # ==================================================
-            # DUPLICATE ACTIVE INGREDIENT ANALYSIS
-            # ==================================================
-
-            ingredient_count = {}
-
-            for ingredient in chosen["Ingredient"].dropna():
-
-                ingredients = [
-                    item.strip()
-                    for item in str(ingredient).split("+")
-                    if item.strip()
-                ]
-
-                for item in ingredients:
-
-                    ingredient_count[item] = (
-                        ingredient_count.get(item, 0) + 1
-                    )
-
-
-            duplicates = [
-                ingredient
-                for ingredient, count
-                in ingredient_count.items()
-                if count > 1
-            ]
-
-
-            duplicate_details = []
-
-
-            for ingredient in duplicates:
-
-                medicines_with_ingredient = []
-
-                for _, medicine_row in chosen.iterrows():
-
-                    medicine_ingredients = [
-                        item.strip()
-                        for item in str(
-                            medicine_row["Ingredient"]
-                        ).split("+")
-                        if item.strip()
-                    ]
-
-                    if ingredient in medicine_ingredients:
-
-                        medicines_with_ingredient.append(
-                            medicine_row["Medicine"]
-                        )
-
 
                 duplicate_details.append(
                     {
@@ -948,12 +872,10 @@ elif page == "🔍 AI Safety Checker":
                     unsafe_allow_html=True
                 )
 
-
                 for duplicate_detail in duplicate_details:
 
                     st.write(
-                        f"**Duplicate Active Ingredient: "
-                        f"{duplicate_detail['ingredient']}**"
+                        f"**Duplicate Active Ingredient: {duplicate_detail['ingredient']}**"
                     )
 
                     st.write(
@@ -962,8 +884,6 @@ elif page == "🔍 AI Safety Checker":
                             duplicate_detail["medicines"]
                         )
                     )
-
-
             # ==================================================
             # CATEGORY ANALYSIS
             # ==================================================
