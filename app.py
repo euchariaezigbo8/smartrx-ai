@@ -1181,56 +1181,24 @@ SmartRx AI recommends professional review before combining products with overlap
 
 
             
-                       # ==================================================
+                                   # ==================================================
             # HERB–DRUG INTERACTION SCREENING
             # ==================================================
 
             interaction_findings = []
-
 
             if not selected_herb_data.empty:
 
                 for _, herb_row in selected_herb_data.iterrows():
 
                     herb_name = herb_row["Herb"]
-
-                    interaction_class = (
-                        herb_row["Interaction_Class"]
-                    )
-
-                    active_compounds = (
-                        herb_row["Active_Compounds"]
-                    )
-
-                    scientific_name = (
-                        herb_row["Scientific"]
-                    )
-
-
-                    if pd.isna(interaction_class):
-                        interaction_class = ""
-
-                    if pd.isna(active_compounds):
-                        active_compounds = "Not available"
-
-                    if pd.isna(scientific_name):
-                        scientific_name = "Not available"
-
-
-                    interaction_class = str(
-                        interaction_class
-                    ).strip()
-
-
-                    if not interaction_class:
-                        continue
-
+                    scientific_name = herb_row["Scientific"]
+                    active_compounds = herb_row["Active_Compounds"]
 
                     herb_interactions = interactions_df[
                         interactions_df["Herb"].astype(str).str.strip()
                         == str(herb_name).strip()
                     ]
-
 
                     for _, interaction in herb_interactions.iterrows():
 
@@ -1238,15 +1206,9 @@ SmartRx AI recommends professional review before combining products with overlap
                             interaction["Drug_Class"]
                         ).strip()
 
-
                         risk = str(
                             interaction["Risk"]
                         ).strip()
-
-
-                        # ------------------------------------------
-                        # SAFE EVIDENCE NOTE
-                        # ------------------------------------------
 
                         evidence = interaction.get(
                             "Evidence_Note",
@@ -1256,118 +1218,30 @@ SmartRx AI recommends professional review before combining products with overlap
                             )
                         )
 
-
-                        if pd.isna(evidence):
-                            evidence = (
-                                "Structured interaction information "
-                                "from the SmartRx AI database."
-                            )
-
-
                         affected_medicines = chosen[
                             chosen["Category"]
                             .astype(str)
                             .str.strip()
-                            .str.upper()
-                            .eq(drug_class.upper())
+                            .str.lower()
+                            .str.rstrip("s")
+                            .eq(drug_class.lower().rstrip("s"))
                         ]
-
 
                         if not affected_medicines.empty:
 
                             interaction_findings.append(
                                 {
                                     "herb": herb_name,
-
                                     "drug_class": drug_class,
-
-                                    "medicines":
-                                        affected_medicines[
-                                            "Medicine"
-                                        ].tolist(),
-
-                                    "scientific_name":
-                                        scientific_name,
-
-                                    "active_compounds":
-                                        active_compounds,
-
-                                    "risk":
-                                        risk,
-
-                                    "evidence":
-                                        str(evidence)
+                                    "medicines": affected_medicines[
+                                        "Medicine"
+                                    ].tolist(),
+                                    "scientific_name": scientific_name,
+                                    "active_compounds": active_compounds,
+                                    "risk": risk,
+                                    "evidence": str(evidence)
                                 }
                             )
-            # ==================================================
-            # DISPLAY HERB–DRUG INTERACTIONS
-            # ==================================================
-
-            if interaction_findings:
-
-                st.subheader(
-                    "🚨 Potential Herb–Drug Interactions"
-                )
-
-
-                for item in interaction_findings:
-
-                    if item["risk"].lower() == "high":
-                        border = "#DC2626"
-
-                    elif item["risk"].lower() == "moderate":
-                        border = "#F59E0B"
-
-                    else:
-                        border = "#16A34A"
-
-
-                    st.markdown(
-                        f"""
-                        <div style="
-                            background:white;
-                            border-left:8px solid {border};
-                            padding:20px;
-                            border-radius:15px;
-                            margin-bottom:18px;
-                            box-shadow:
-                            0 4px 12px rgba(0,0,0,0.08);
-                        ">
-
-                        <h4 style="color:{border};">
-                        🚨 {item["herb"]} +
-                        {item["drug_class"]} Medicines
-                        </h4>
-
-                        <p>
-                        <strong>Orthodox Medicines:</strong>
-                        {", ".join(item["medicines"])}
-                        </p>
-
-                        <p>
-                        <strong>Scientific Name:</strong>
-                        <em>{item["scientific_name"]}</em>
-                        </p>
-
-                        <p>
-                        <strong>Major Active Compounds:</strong>
-                        {item["active_compounds"]}
-                        </p>
-
-                        <p>
-                        <strong>Risk Level:</strong>
-                        {item["risk"]}
-                        </p>
-
-                        <p>
-                        <strong>Evidence Note:</strong>
-                        {item["evidence"]}
-                        </p>
-
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
 
 
             # ==================================================
@@ -1384,16 +1258,12 @@ SmartRx AI recommends professional review before combining products with overlap
                     """
                     <div class="safe">
 
-                    <h3>
-                    ✅ No Major Issue Detected by Current Rules
-                    </h3>
+                    <h3>✅ No Major Issue Detected by Current Rules</h3>
 
                     <p>
-                    No duplicate active ingredients,
-                    multiple-NSAID conflicts or stored
-                    herb–drug interaction flags were
-                    identified by the current structured
-                    screening rules.
+                    No duplicate active ingredients, medicine-class
+                    conflicts or stored herb–drug interaction flags
+                    were identified for the selected combination.
                     </p>
 
                     </div>
@@ -1408,23 +1278,17 @@ SmartRx AI recommends professional review before combining products with overlap
 
             safety_findings = {
 
-                "selected_medicines":
-                    selected_medicines,
+                "selected_medicines": selected_medicines,
 
-                "duplicate_active_ingredients":
-                    duplicate_details,
+                "duplicate_active_ingredients": duplicate_details,
 
-                "category_warnings":
-                    category_warnings,
+                "category_warnings": category_warnings,
 
-                "medicine_warnings":
-                    medicine_warnings,
+                "medicine_warnings": medicine_warnings,
 
-                "herb_drug_interactions":
-                    interaction_findings,
+                "herb_drug_interactions": interaction_findings,
 
-                "selected_herbs":
-                    herbal_findings
+                "selected_herbs": herbal_findings
             }
 
 
@@ -1432,10 +1296,7 @@ SmartRx AI recommends professional review before combining products with overlap
             # AI SAFETY EXPLANATION
             # ==================================================
 
-            st.subheader(
-                "🤖 AI Safety Explanation"
-            )
-
+            st.subheader("🤖 AI Safety Explanation")
 
             with st.spinner(
                 "SmartRx AI is generating a safety explanation..."
@@ -1443,26 +1304,21 @@ SmartRx AI recommends professional review before combining products with overlap
 
                 try:
 
-                    ai_explanation = (
-                        generate_ai_explanation(
-                            safety_findings
-                        )
+                    ai_explanation = generate_ai_explanation(
+                        safety_findings
                     )
 
                 except Exception:
 
                     ai_explanation = (
-                        "The structured safety screening was "
-                        "completed, but the AI explanation "
-                        "could not be generated at this time."
+                        "The structured safety screening was completed, "
+                        "but the AI explanation could not be generated "
+                        "at this time."
                     )
 
                     st.warning(
-                        "AI explanation service is temporarily "
-                        "unavailable. The structured screening "
-                        "results above are still available."
+                        "AI explanation service is temporarily unavailable."
                     )
-
 
             st.markdown(
                 """
@@ -1476,7 +1332,6 @@ SmartRx AI recommends professional review before combining products with overlap
                 """,
                 unsafe_allow_html=True
             )
-
 
             st.write(ai_explanation)
 
