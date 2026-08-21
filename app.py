@@ -518,7 +518,7 @@ elif page == "ℹ️ About":
 
 
     st.info(
-        "SmartRx AI is an educational and decision-support "
+        "SmartRx AI is a health decision-support "
         "platform. It does not replace a qualified doctor, "
         "pharmacist or other healthcare professional."
     )
@@ -959,7 +959,7 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                 )
 
 
-            # ==================================================
+                        # ==================================================
             # 3. HERB–DRUG INTERACTION
             # ==================================================
 
@@ -986,7 +986,8 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
 
                         drug_class = str(
                             interaction.get(
-                                "Drug_Class", ""
+                                "Drug_Class",
+                                ""
                             )
                         ).strip()
 
@@ -1001,15 +1002,13 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                             "Evidence_Note",
                             interaction.get(
                                 "Evidence",
-                                "Structured interaction information from the SmartRx AI database."
+                                ""
                             )
                         )
 
                         if pd.isna(evidence):
 
-                            evidence = (
-                                "Structured interaction information from the SmartRx AI database."
-                            )
+                            evidence = ""
 
                         affected_medicines = chosen[
                             chosen["Category"]
@@ -1025,20 +1024,39 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
 
                             interaction_findings.append(
                                 {
-                                    "herb": herb_name,
-                                    "drug_class": drug_class,
+                                    "herb":
+                                        herb_name,
+
+                                    "drug_class":
+                                        drug_class,
+
                                     "medicines":
                                         affected_medicines[
                                             "Medicine"
                                         ].tolist(),
+
                                     "scientific_name":
-                                        herb_row["Scientific"],
+                                        herb_row[
+                                            "Scientific"
+                                        ],
+
                                     "active_compounds":
-                                        herb_row["Active_Compounds"],
-                                    "risk": risk,
-                                    "evidence": str(evidence)
+                                        herb_row[
+                                            "Active_Compounds"
+                                        ],
+
+                                    "risk":
+                                        risk,
+
+                                    "evidence":
+                                        str(evidence)
                                 }
                             )
+
+
+            # --------------------------------------------------
+            # DISPLAY ONLY WHEN AN INTERACTION IS DETECTED
+            # --------------------------------------------------
 
             if interaction_findings:
 
@@ -1095,7 +1113,10 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                         in herb_compounds.lower()
                     )
 
-                    if is_artemisia or contains_artemisinin:
+                    if (
+                        is_artemisia
+                        or contains_artemisinin
+                    ):
 
                         for _, medicine in chosen.iterrows():
 
@@ -1107,22 +1128,43 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
 
                                 compound_relationships.append(
                                     {
-                                        "herb": herb_name,
+                                        "herb":
+                                            herb_name,
+
                                         "medicine":
-                                            medicine["Medicine"],
+                                            medicine[
+                                                "Medicine"
+                                            ],
+
                                         "herb_compound":
                                             "Artemisinin",
+
                                         "medicine_compound":
                                             "Artemether",
+
                                         "relationship":
-                                            "Artemisinin is the natural compound from Artemisia annua, while artemether is its pharmaceutical derivative used in ACT medicines."
+                                            (
+                                                "Artemisinin is the "
+                                                "natural compound associated "
+                                                "with Artemisia annua, while "
+                                                "artemether is a pharmaceutical "
+                                                "derivative used in "
+                                                "artemisinin-based "
+                                                "antimalarial medicines."
+                                            )
                                     }
                                 )
+
+
+            # --------------------------------------------------
+            # DISPLAY ONLY WHEN A RELATIONSHIP IS DETECTED
+            # --------------------------------------------------
 
             if compound_relationships:
 
                 st.markdown(
-                    "### 🟣 Potential Active Compound / Drug-Derivative Relationship"
+                    "### 🟣 Potential Active Compound / "
+                    "Drug-Derivative Relationship"
                 )
 
                 for item in compound_relationships:
@@ -1135,7 +1177,7 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
 
 {item["relationship"]}
 
-**Important:** This is **not** a duplicate active ingredient. SmartRx AI identifies this as a pharmacologically relevant relationship that should be reviewed before combining an Artemisia preparation with an artemisinin-based antimalarial medicine.
+**Important:** This is **not** a duplicate active ingredient. It is a pharmacologically relevant relationship that should be reviewed before combining an Artemisia preparation with an artemisinin-based antimalarial medicine.
                         """
                     )
 
@@ -1231,13 +1273,12 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                     <div class="safe">
 
                     <h3>
-                    ✅ No Major Issue Detected by Current Rules
+                    ✅ No Major Safety Conflict Detected
                     </h3>
 
                     <p>
-                    No duplicate active ingredients,
-                    medicine-class conflicts or stored
-                    herb–drug interaction flags were identified
+                    No major safety conflict was identified
+                    by the current SmartRx AI screening rules
                     for the selected combination.
                     </p>
 
@@ -1276,7 +1317,7 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             }
 
 
-                       # ==================================================
+            # ==================================================
             # 9. AI SAFETY EXPLANATION
             # ==================================================
 
