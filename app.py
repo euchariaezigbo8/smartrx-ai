@@ -785,16 +785,14 @@ elif page == "🔍 AI Safety Checker":
                     hide_index=True
                 )
 
-            # ==================================================
+                        # ==================================================
             # AI CLINICAL SAFETY ANALYSIS
             # ==================================================
 
             st.subheader("🧠 AI Clinical Safety Analysis")
 
-            # Paste the 🔴 🟠 🟡 🟣 analysis code immediately below this
-
             # ==================================================
-            # DUPLICATE ACTIVE INGREDIENT ANALYSIS
+            # DUPLICATE MEDICINE INGREDIENT ANALYSIS
             # ==================================================
 
             ingredient_count = {}
@@ -808,15 +806,13 @@ elif page == "🔍 AI Safety Checker":
                 ]
 
                 for item in ingredients:
-
                     ingredient_count[item] = (
                         ingredient_count.get(item, 0) + 1
                     )
 
             duplicates = [
                 ingredient
-                for ingredient, count
-                in ingredient_count.items()
+                for ingredient, count in ingredient_count.items()
                 if count > 1
             ]
 
@@ -837,7 +833,6 @@ elif page == "🔍 AI Safety Checker":
                     ]
 
                     if ingredient in medicine_ingredients:
-
                         medicines_with_ingredient.append(
                             medicine_row["Medicine"]
                         )
@@ -849,37 +844,130 @@ elif page == "🔍 AI Safety Checker":
                     }
                 )
 
-
             # ==================================================
-            # DUPLICATE INGREDIENT DISPLAY
+            # 1. DUPLICATE MEDICINE INGREDIENT
             # ==================================================
 
-            if duplicates:
+            if duplicate_details:
 
-                st.markdown(
-                    """
-                    <div class="danger">
+                st.markdown("### 🔴 Duplicate Medicine Ingredient")
 
-                    <h3>
-                    🚨 Duplicate Active Ingredient Detected
-                    </h3>
+                for item in duplicate_details:
 
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+                    st.markdown(
+                        f"""
+> **{" + ".join(item["medicines"])}**
 
-                for duplicate_detail in duplicate_details:
-
-                    st.write(
-                        f"**Duplicate Active Ingredient: {duplicate_detail['ingredient']}**"
+Both medicines contain **{item["ingredient"]}**.
+                        """
                     )
 
-                    st.write(
-                        "Found in: "
-                        + ", ".join(
-                            duplicate_detail["medicines"]
-                        )
+            # ==================================================
+            # 2. MEDICINE-CLASS CONFLICT
+            # ==================================================
+
+            nsaid_medicines = chosen[
+                chosen["Category"]
+                .astype(str)
+                .str.upper()
+                .eq("NSAID")
+            ].copy()
+
+            if len(nsaid_medicines) > 1:
+
+                st.markdown("### 🟠 Medicine-Class Conflict")
+
+                st.markdown(
+                    f"""
+> **{" + ".join(nsaid_medicines["Medicine"].tolist())}**
+
+Both medicines belong to the **NSAID** class and may increase the risk of stomach irritation and bleeding.
+                    """
+                )
+
+                st.dataframe(
+                    nsaid_medicines[
+                        ["Medicine", "Ingredient"]
+                    ].rename(
+                        columns={
+                            "Ingredient": "Active Ingredient"
+                        }
+                    ),
+                    use_container_width=True,
+                    hide_index=True
+                )
+
+            # ==================================================
+            # 3. HERB–DRUG INTERACTION
+            # ==================================================
+
+            if interaction_findings:
+
+                st.markdown("### 🟡 Herb–Drug Interaction")
+
+                for item in interaction_findings:
+
+                    st.markdown(
+                        f"""
+> **{item["herb"]} + {", ".join(item["medicines"])}**
+
+**Potential pharmacological overlap detected**
+
+- **Drug Class:** {item["drug_class"]}
+- **Major Active Compounds:** {item["active_compounds"]}
+- **Risk Level:** {item["risk"]}
+- **Evidence:** {item["evidence"]}
+                        """
+                    )
+
+            # ==================================================
+            # 4. HERB–MEDICINE COMPOUND OVERLAP
+            # ==================================================
+
+            compound_overlaps = []
+
+            for _, herb in selected_herb_data.iterrows():
+
+                compounds = [
+                    c.strip()
+                    for c in str(
+                        herb["Active_Compounds"]
+                    ).split(";")
+                    if c.strip()
+                ]
+
+                for _, med in chosen.iterrows():
+
+                    ingredient = str(
+                        med["Ingredient"]
+                    ).lower()
+
+                    for compound in compounds:
+
+                        if compound.lower() in ingredient:
+
+                            compound_overlaps.append(
+                                {
+                                    "herb": herb["Herb"],
+                                    "medicine": med["Medicine"],
+                                    "compound": compound
+                                }
+                            )
+
+            if compound_overlaps:
+
+                st.markdown("### 🟣 Potential Active Compound Overlap")
+
+                for item in compound_overlaps:
+
+                    st.markdown(
+                        f"""
+> **{item["herb"]} + {item["medicine"]}**
+
+Both contain **{item["compound"]}**.
+
+SmartRx AI recommends professional review before combining products with overlapping bioactive compounds.
+                        """
                     )
             # ==================================================
             # CATEGORY ANALYSIS
