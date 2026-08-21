@@ -591,7 +591,7 @@ elif page == "🔍 AI Safety Checker":
                 .tolist()
             )
 
-            category_warnings = []
+                        category_warnings = []
 
             if categories.count("NSAID") > 1:
 
@@ -602,200 +602,213 @@ elif page == "🔍 AI Safety Checker":
                 )
 
 
-# ==================================================
-# HERBAL SAFETY INFORMATION
-# ==================================================
+            # ==================================================
+            # HERBAL SAFETY INFORMATION
+            # ==================================================
 
-selected_herb_data = herbs_df[
-    herbs_df["Herb"].isin(selected_herbs)
-]
+            selected_herb_data = herbs_df[
+                herbs_df["Herb"].isin(selected_herbs)
+            ]
 
-herbal_findings = []
+            herbal_findings = []
 
-for _, herb_row in selected_herb_data.iterrows():
+            for _, herb_row in selected_herb_data.iterrows():
 
-    scientific = (
-        herb_row.get("Scientific")
-        or "Not available"
-    )
+                scientific = (
+                    herb_row.get("Scientific")
+                    or "Not available"
+                )
 
-    traditional_names = (
-        f'Yoruba: {herb_row.get("Yoruba", "Not available")} • '
-        f'Hausa: {herb_row.get("Hausa", "Not available")} • '
-        f'Igbo: {herb_row.get("Igbo", "Not available")}'
-    )
+                traditional_names = (
+                    f'Yoruba: {herb_row.get("Yoruba", "Not available")} • '
+                    f'Hausa: {herb_row.get("Hausa", "Not available")} • '
+                    f'Igbo: {herb_row.get("Igbo", "Not available")}'
+                )
 
-    safety_caution = (
-        herb_row.get("Safety_Caution")
-        or "No safety caution available."
-    )
+                safety_caution = (
+                    herb_row.get("Safety_Caution")
+                    or "No safety caution available."
+                )
 
-    herbal_findings.append(
-        {
-            "herb": herb_row["Herb"],
-            "scientific_name": scientific,
-            "traditional_names": traditional_names,
-            "safety_caution": safety_caution
-        }
-    )
-
-
-# ==================================================
-# STRUCTURED SMART RX AI FINDINGS
-# ==================================================
-
-safety_findings = {
-
-    "selected_medicines": selected_medicines,
-
-    "duplicate_active_ingredients": duplicate_details,
-
-    "category_warnings": category_warnings,
-
-    "medicine_warnings": [
-        {
-            "medicine": row["Medicine"],
-            "warning": row["Warning"]
-        }
-        for _, row in chosen.iterrows()
-    ],
-
-    "selected_herbs": herbal_findings
-}
-
-# ==================================================
-# DISPLAY STRUCTURED FINDINGS
-# ==================================================
-
-if duplicates:
-
-    st.markdown("""
-    <div class="danger">
-
-    <h3>🚨 Duplicate Active Ingredient Detected</h3>
-
-    </div>
-    """, unsafe_allow_html=True)
-
-    for duplicate_detail in duplicate_details:
-
-        ingredient = duplicate_detail["ingredient"]
-        medicines = duplicate_detail["medicines"]
-
-        st.write(
-            f"**Duplicate Active Ingredient: {ingredient}**"
-        )
-
-        st.write(
-            "Found in: " + ", ".join(medicines)
-        )
+                herbal_findings.append(
+                    {
+                        "herb": herb_row["Herb"],
+                        "scientific_name": scientific,
+                        "traditional_names": traditional_names,
+                        "safety_caution": safety_caution
+                    }
+                )
 
 
-if category_warnings:
+            # ==================================================
+            # STRUCTURED SMART RX AI FINDINGS
+            # ==================================================
 
-    st.markdown("""
-    <div class="warning">
+            safety_findings = {
 
-    <h3>⚠️ Medicine Combination Warning</h3>
+                "selected_medicines": selected_medicines,
 
-    </div>
-    """, unsafe_allow_html=True)
+                "duplicate_active_ingredients": duplicate_details,
 
-    for warning in category_warnings:
+                "category_warnings": category_warnings,
 
-        st.write(warning)
+                "medicine_warnings": [
+                    {
+                        "medicine": row["Medicine"],
+                        "warning": row["Warning"]
+                    }
+                    for _, row in chosen.iterrows()
+                ],
 
-
-if not duplicates and not category_warnings:
-
-    st.markdown("""
-    <div class="safe">
-
-    <h3>✅ No Major Issue Detected by Current Rules</h3>
-
-    </div>
-""", unsafe_allow_html=True)
-
-# ==================================================
-# HERBAL SAFETY FINDINGS
-# ==================================================
-
-if herbal_findings:
-
-    st.subheader("🌿 Herbal Safety Findings")
-
-    for herb in herbal_findings:
-
-        st.markdown(
-            f"""
-            <div class="section">
-
-            <h3 style="color:#4338CA;">
-            🌿 {herb["herb"]}
-            </h3>
-
-            <p>
-            <strong>Scientific Name:</strong>
-            {herb["scientific_name"]}
-            </p>
-
-            <p>
-            <strong>Traditional Names:</strong>
-            {herb["traditional_names"]}
-            </p>
-
-            <p>
-            <strong>Safety Caution:</strong>
-            {herb["safety_caution"]}
-            </p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                "selected_herbs": herbal_findings
+            }
 
 
-# ==================================================
-# AI EXPLANATION
-# ==================================================
+            # ==================================================
+            # DISPLAY STRUCTURED FINDINGS
+            # ==================================================
 
-st.subheader("🤖 AI Safety Explanation")
+            if duplicates:
 
-with st.spinner(
-    "SmartRx AI is generating a safety explanation..."
-):
+                st.markdown(
+                    """
+                    <div class="danger">
 
-    ai_explanation = generate_ai_explanation(
-        safety_findings
-    )
+                    <h3>🚨 Duplicate Active Ingredient Detected</h3>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                for duplicate_detail in duplicate_details:
+
+                    ingredient = duplicate_detail["ingredient"]
+                    medicines = duplicate_detail["medicines"]
+
+                    st.write(
+                        f"**Duplicate Active Ingredient: {ingredient}**"
+                    )
+
+                    st.write(
+                        "Found in: " + ", ".join(medicines)
+                    )
 
 
-st.markdown(
-    """
-    <div class="ai-box">
+            if category_warnings:
 
-    <h3 style="color:#4338CA;">
-    🤖 Meta AI Safety Explanation
-    </h3>
+                st.markdown(
+                    """
+                    <div class="warning">
 
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+                    <h3>⚠️ Medicine Combination Warning</h3>
 
-st.write(ai_explanation)
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                for warning in category_warnings:
+
+                    st.write(warning)
 
 
-# ==================================================
-# DISCLAIMER
-# ==================================================
+            if not duplicates and not category_warnings:
 
-st.info(
-    "⚠️ SmartRx AI provides educational and "
-    "decision-support information only. It does "
-    "not diagnose medical conditions or replace "
-    "a qualified doctor or pharmacist."
-)
+                st.markdown(
+                    """
+                    <div class="safe">
+
+                    <h3>✅ No Major Issue Detected by Current Rules</h3>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+
+            # ==================================================
+            # HERBAL SAFETY FINDINGS
+            # ==================================================
+
+            if herbal_findings:
+
+                st.subheader("🌿 Herbal Safety Findings")
+
+                for herb in herbal_findings:
+
+                    st.markdown(
+                        f"""
+                        <div class="section">
+
+                        <h3 style="color:#4338CA;">
+                        🌿 {herb["herb"]}
+                        </h3>
+
+                        <p>
+                        <strong>Scientific Name:</strong>
+                        {herb["scientific_name"]}
+                        </p>
+
+                        <p>
+                        <strong>Traditional Names:</strong>
+                        {herb["traditional_names"]}
+                        </p>
+
+                        <p>
+                        <strong>Safety Caution:</strong>
+                        {herb["safety_caution"]}
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+
+            # ==================================================
+            # AI EXPLANATION
+            # ==================================================
+
+            st.subheader("🤖 AI Safety Explanation")
+
+            with st.spinner(
+                "SmartRx AI is generating a safety explanation..."
+            ):
+
+                ai_explanation = generate_ai_explanation(
+                    safety_findings
+                )
+
+
+            st.markdown(
+                """
+                <div class="ai-box">
+
+                <h3 style="color:#4338CA;">
+                🤖 Meta AI Safety Explanation
+                </h3>
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            st.write(ai_explanation)
+
+
+            # ==================================================
+            # DISCLAIMER
+            # ==================================================
+
+            st.info(
+                "⚠️ SmartRx AI provides educational and "
+                "decision-support information only. It does "
+                "not diagnose medical conditions or replace "
+                "a qualified doctor or pharmacist."
+            )
+
+
 # ==========================================================
 # FOOTER
 # ==========================================================
