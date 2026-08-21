@@ -664,49 +664,59 @@ safety_findings = {
 
     "selected_herbs": herbal_findings
 }
-            # ==================================================
-            # DISPLAY STRUCTURED FINDINGS
-            # ==================================================
 
-            if duplicates:
+# ==================================================
+# DISPLAY STRUCTURED FINDINGS
+# ==================================================
 
-                st.markdown("""
-                <div class="danger">
+if duplicates:
 
-                <h3>🚨 Duplicate Active Ingredient Detected</h3>
+    st.markdown("""
+    <div class="danger">
 
-                </div>
-                """, unsafe_allow_html=True)
+    <h3>🚨 Duplicate Active Ingredient Detected</h3>
 
-                for duplicate in duplicates:
+    </div>
+    """, unsafe_allow_html=True)
 
-                    st.write(
-                        f"**Duplicate Active Ingredient:** {duplicate}"
-                    )
+    for duplicate_detail in duplicate_details:
 
-            if category_warnings:
+        ingredient = duplicate_detail["ingredient"]
+        medicines = duplicate_detail["medicines"]
 
-                st.markdown("""
-                <div class="warning">
+        st.write(
+            f"**Duplicate Active Ingredient: {ingredient}**"
+        )
 
-                <h3>⚠️ Medicine Combination Warning</h3>
+        st.write(
+            "Found in: " + ", ".join(medicines)
+        )
 
-                </div>
-                """, unsafe_allow_html=True)
 
-                for warning in category_warnings:
+if category_warnings:
 
-                    st.write(warning)
+    st.markdown("""
+    <div class="warning">
 
-            if not duplicates and not category_warnings:
+    <h3>⚠️ Medicine Combination Warning</h3>
 
-                st.markdown("""
-                <div class="safe">
+    </div>
+    """, unsafe_allow_html=True)
 
-                <h3>✅ No Major Issue Detected by Current Rules</h3>
+    for warning in category_warnings:
 
-                </div>
-                """, unsafe_allow_html=True)
+        st.write(warning)
+
+
+if not duplicates and not category_warnings:
+
+    st.markdown("""
+    <div class="safe">
+
+    <h3>✅ No Major Issue Detected by Current Rules</h3>
+
+    </div>
+    """, unsafe_allow_html=True)
             # ==================================================
             # HERBAL SAFETY FINDINGS
             # ==================================================
