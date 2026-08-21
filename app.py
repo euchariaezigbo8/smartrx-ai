@@ -780,21 +780,19 @@ elif page == "🔍 AI Safety Checker":
                     "Safety Caution"
                 ]
 
-                st.dataframe(
+                                st.dataframe(
                     herb_table,
                     use_container_width=True,
                     hide_index=True
                 )
 
-
             # ==================================================
-            # SAFETY SCREENING RESULTS
+            # AI CLINICAL SAFETY ANALYSIS
             # ==================================================
 
-            st.subheader(
-                "🔬 Safety Screening Results"
-            )
+            st.subheader("🧠 AI Clinical Safety Analysis")
 
+            # Paste the 🔴 🟠 🟡 🟣 analysis code immediately below this
 
             # ==================================================
             # DUPLICATE ACTIVE INGREDIENT ANALYSIS
@@ -1027,47 +1025,7 @@ elif page == "🔍 AI Safety Checker":
                         unsafe_allow_html=True
                     )
 
-
-            # ==================================================
-            # MEDICINE FINDINGS
-            # ==================================================
-
-            if medicine_warnings:
-
-                st.subheader("💊 Medicine Findings")
-
-
-                for finding in medicine_warnings:
-
-                    st.markdown(
-                        f"""
-                        <div class="section">
-
-                        <h4 style="color:#4338CA;">
-                        💊 {finding["medicine"]}
-                        </h4>
-
-                        <p>
-                        <strong>Active Ingredient:</strong>
-                        {finding["ingredient"]}
-                        </p>
-
-                        <p>
-                        <strong>Drug Class:</strong>
-                        {finding["category"]}
-                        </p>
-
-                        <p>
-                        <strong>Safety Information:</strong>
-                        {finding["warning"]}
-                        </p>
-
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-
-
+           
             # ==================================================
             # HERBAL SAFETY INFORMATION
             # ==================================================
@@ -1135,54 +1093,7 @@ elif page == "🔍 AI Safety Checker":
                 )
 
 
-            # ==================================================
-            # HERBAL SAFETY FINDINGS
-            # ==================================================
-
-            if herbal_findings:
-
-                st.subheader(
-                    "🌿 Herbal Safety Findings"
-                )
-
-
-                for herb in herbal_findings:
-
-                    st.markdown(
-                        f"""
-                        <div class="section">
-
-                        <h3 style="color:#4338CA;">
-                        🌿 {herb["herb"]}
-                        </h3>
-
-                        <p>
-                        <strong>Scientific Name:</strong>
-                        <em>{herb["scientific_name"]}</em>
-                        </p>
-
-                        <p>
-                        <strong>Traditional Names:</strong>
-                        {herb["traditional_names"]}
-                        </p>
-
-                        <p>
-                        <strong>Major Active Compounds:</strong>
-                        {herb["active_compounds"]}
-                        </p>
-
-                        <p>
-                        <strong>Safety Caution:</strong>
-                        {herb["safety_caution"]}
-                        </p>
-
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-
-
-                       # ==================================================
+            
                        # ==================================================
             # HERB–DRUG INTERACTION SCREENING
             # ==================================================
