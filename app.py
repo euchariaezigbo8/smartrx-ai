@@ -479,7 +479,7 @@ elif page == "🔍 AI Safety Checker":
         placeholder="Search and select herbs..."
     )
 
-    # ======================================================
+       # ======================================================
     # SAFETY VERIFICATION
     # ======================================================
 
@@ -521,7 +521,8 @@ elif page == "🔍 AI Safety Checker":
                 hide_index=True
             )
 
-                                    # ==================================================
+
+            # ==================================================
             # DUPLICATE INGREDIENT ANALYSIS
             # ==================================================
 
@@ -532,14 +533,14 @@ elif page == "🔍 AI Safety Checker":
                 ingredients = [
                     item.strip()
                     for item in str(ingredient).split("+")
+                    if item.strip()
                 ]
 
                 for item in ingredients:
 
-                    if item:
-                        ingredient_count[item] = (
-                            ingredient_count.get(item, 0) + 1
-                        )
+                    ingredient_count[item] = (
+                        ingredient_count.get(item, 0) + 1
+                    )
 
 
             duplicates = [
@@ -567,6 +568,7 @@ elif page == "🔍 AI Safety Checker":
                         for item in str(
                             medicine_row["Ingredient"]
                         ).split("+")
+                        if item.strip()
                     ]
 
                     if ingredient in medicine_ingredients:
@@ -581,6 +583,8 @@ elif page == "🔍 AI Safety Checker":
                         "medicines": medicines_with_ingredient
                     }
                 )
+
+
             # ==================================================
             # CATEGORY ANALYSIS
             # ==================================================
@@ -591,7 +595,7 @@ elif page == "🔍 AI Safety Checker":
                 .tolist()
             )
 
-                        category_warnings = []
+            category_warnings = []
 
             if categories.count("NSAID") > 1:
 
@@ -645,12 +649,13 @@ elif page == "🔍 AI Safety Checker":
             # ==================================================
 
             safety_findings = {
-
                 "selected_medicines": selected_medicines,
 
-                "duplicate_active_ingredients": duplicate_details,
+                "duplicate_active_ingredients":
+                    duplicate_details,
 
-                "category_warnings": category_warnings,
+                "category_warnings":
+                    category_warnings,
 
                 "medicine_warnings": [
                     {
@@ -660,12 +665,13 @@ elif page == "🔍 AI Safety Checker":
                     for _, row in chosen.iterrows()
                 ],
 
-                "selected_herbs": herbal_findings
+                "selected_herbs":
+                    herbal_findings
             }
 
 
             # ==================================================
-            # DISPLAY STRUCTURED FINDINGS
+            # DISPLAY DUPLICATE FINDINGS
             # ==================================================
 
             if duplicates:
@@ -674,7 +680,9 @@ elif page == "🔍 AI Safety Checker":
                     """
                     <div class="danger">
 
-                    <h3>🚨 Duplicate Active Ingredient Detected</h3>
+                    <h3>
+                    🚨 Duplicate Active Ingredient Detected
+                    </h3>
 
                     </div>
                     """,
@@ -684,16 +692,23 @@ elif page == "🔍 AI Safety Checker":
                 for duplicate_detail in duplicate_details:
 
                     ingredient = duplicate_detail["ingredient"]
+
                     medicines = duplicate_detail["medicines"]
 
                     st.write(
-                        f"**Duplicate Active Ingredient: {ingredient}**"
+                        f"**Duplicate Active Ingredient: "
+                        f"{ingredient}**"
                     )
 
                     st.write(
-                        "Found in: " + ", ".join(medicines)
+                        "Found in: "
+                        + ", ".join(medicines)
                     )
 
+
+            # ==================================================
+            # DISPLAY CATEGORY WARNINGS
+            # ==================================================
 
             if category_warnings:
 
@@ -701,7 +716,9 @@ elif page == "🔍 AI Safety Checker":
                     """
                     <div class="warning">
 
-                    <h3>⚠️ Medicine Combination Warning</h3>
+                    <h3>
+                    ⚠️ Medicine Combination Warning
+                    </h3>
 
                     </div>
                     """,
@@ -713,13 +730,19 @@ elif page == "🔍 AI Safety Checker":
                     st.write(warning)
 
 
+            # ==================================================
+            # NO MAJOR ISSUE
+            # ==================================================
+
             if not duplicates and not category_warnings:
 
                 st.markdown(
                     """
                     <div class="safe">
 
-                    <h3>✅ No Major Issue Detected by Current Rules</h3>
+                    <h3>
+                    ✅ No Major Issue Detected by Current Rules
+                    </h3>
 
                     </div>
                     """,
@@ -733,7 +756,9 @@ elif page == "🔍 AI Safety Checker":
 
             if herbal_findings:
 
-                st.subheader("🌿 Herbal Safety Findings")
+                st.subheader(
+                    "🌿 Herbal Safety Findings"
+                )
 
                 for herb in herbal_findings:
 
@@ -770,14 +795,18 @@ elif page == "🔍 AI Safety Checker":
             # AI EXPLANATION
             # ==================================================
 
-            st.subheader("🤖 AI Safety Explanation")
+            st.subheader(
+                "🤖 AI Safety Explanation"
+            )
 
             with st.spinner(
                 "SmartRx AI is generating a safety explanation..."
             ):
 
-                ai_explanation = generate_ai_explanation(
-                    safety_findings
+                ai_explanation = (
+                    generate_ai_explanation(
+                        safety_findings
+                    )
                 )
 
 
@@ -807,23 +836,3 @@ elif page == "🔍 AI Safety Checker":
                 "not diagnose medical conditions or replace "
                 "a qualified doctor or pharmacist."
             )
-
-
-# ==========================================================
-# FOOTER
-# ==========================================================
-
-st.markdown(
-    """
-    <div class="footer">
-
-    <strong>SmartRx AI © 2026</strong><br>
-
-    AI-Powered Medication & Herbal Safety Intelligence<br>
-
-    Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
-
-    </div>
-    """,
-    unsafe_allow_html=True
-)
