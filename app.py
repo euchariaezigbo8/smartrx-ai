@@ -581,25 +581,25 @@ elif page == "🔍 AI Safety Checker":
                         "medicines": medicines_with_ingredient
                     }
                 )
-# ==================================================
-# CATEGORY ANALYSIS
-# ==================================================
+            # ==================================================
+            # CATEGORY ANALYSIS
+            # ==================================================
 
-categories = (
-    chosen["Category"]
-    .dropna()
-    .tolist()
-)
+            categories = (
+                chosen["Category"]
+                .dropna()
+                .tolist()
+            )
 
-category_warnings = []
+            category_warnings = []
 
-if categories.count("NSAID") > 1:
+            if categories.count("NSAID") > 1:
 
-    category_warnings.append(
-        "Multiple NSAID medicines were selected. "
-        "Combining NSAIDs may increase the risk "
-        "of stomach irritation and bleeding."
-    )
+                category_warnings.append(
+                    "Multiple NSAID medicines were selected. "
+                    "Combining NSAIDs may increase the risk "
+                    "of stomach irritation and bleeding."
+                )
 
 
 # ==================================================
