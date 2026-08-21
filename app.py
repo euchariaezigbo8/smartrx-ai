@@ -1321,8 +1321,8 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             )
 
 
-            # ==================================================
-            # 10. PROFESSIONAL GUIDANCE
+                        # ==================================================
+            # 10. PROFESSIONAL GUIDANCE & DISCLAIMER
             # ==================================================
 
             st.subheader(
@@ -1332,40 +1332,39 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             st.markdown(
                 """
                 SmartRx AI provides educational and
-                decision-support information.
-
-                It does not diagnose medical conditions
-                or replace a qualified doctor or pharmacist.
-
-                Consult a qualified healthcare professional
-                for personalised medical advice before
-                starting, stopping or combining medicines
-                or herbal products.
-                """
-            )
-
-
-            # ==================================================
-            # 11. SMART RX AI DISCLAIMER
-            # ==================================================
-
-            st.markdown(
-                """
-                #### ⚠️ SmartRx AI Disclaimer
-
-                SmartRx AI provides educational and
                 decision-support information only.
 
-                It is not a substitute for professional
-                medical diagnosis, treatment or advice.
+                It does not diagnose medical conditions,
+                prescribe treatment, or replace a qualified
+                doctor or pharmacist.
 
-                Always consult a qualified doctor or pharmacist
-                before making decisions about medicines or
+                Always consult a qualified healthcare
+                professional before starting, stopping,
+                changing, or combining medicines or
                 herbal products.
                 """
             )
 
 
+            # ==========================================================
+            # FOOTER
+            # ==========================================================
+
+            st.markdown(
+                """
+                <div class="footer">
+
+                <strong>SmartRx AI © 2026</strong><br><br>
+
+                AI-Powered Medication & Herbal Safety Intelligence<br>
+
+                Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            
             # ==========================================================
             # FOOTER
             # ==========================================================
