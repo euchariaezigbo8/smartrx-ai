@@ -521,68 +521,66 @@ elif page == "🔍 AI Safety Checker":
                 hide_index=True
             )
 
-                        # ==================================================
-# DUPLICATE INGREDIENT ANALYSIS
-# ==================================================
+                                    # ==================================================
+            # DUPLICATE INGREDIENT ANALYSIS
+            # ==================================================
 
-ingredient_count = {}
+            ingredient_count = {}
 
-for ingredient in chosen["Ingredient"].dropna():
+            for ingredient in chosen["Ingredient"].dropna():
 
-    ingredients = [
-        item.strip()
-        for item in str(ingredient).split("+")
-    ]
+                ingredients = [
+                    item.strip()
+                    for item in str(ingredient).split("+")
+                ]
 
-    for item in ingredients:
+                for item in ingredients:
 
-        if item:
-            ingredient_count[item] = (
-                ingredient_count.get(item, 0) + 1
-            )
-
-
-duplicates = [
-    ingredient
-    for ingredient, count
-    in ingredient_count.items()
-    if count > 1
-]
+                    if item:
+                        ingredient_count[item] = (
+                            ingredient_count.get(item, 0) + 1
+                        )
 
 
-# ==================================================
-# MAP DUPLICATE INGREDIENTS TO MEDICINES
-# ==================================================
-
-duplicate_details = []
-
-for ingredient in duplicates:
-
-    medicines_with_ingredient = []
-
-    for _, medicine_row in chosen.iterrows():
-
-        medicine_ingredients = [
-            item.strip()
-            for item in str(
-                medicine_row["Ingredient"]
-            ).split("+")
-        ]
-
-        if ingredient in medicine_ingredients:
-
-            medicines_with_ingredient.append(
-                medicine_row["Medicine"]
-            )
-
-    duplicate_details.append(
-        {
-            "ingredient": ingredient,
-            "medicines": medicines_with_ingredient
-        }
-    )
+            duplicates = [
+                ingredient
+                for ingredient, count
+                in ingredient_count.items()
+                if count > 1
+            ]
 
 
+            # ==================================================
+            # MAP DUPLICATE INGREDIENTS TO MEDICINES
+            # ==================================================
+
+            duplicate_details = []
+
+            for ingredient in duplicates:
+
+                medicines_with_ingredient = []
+
+                for _, medicine_row in chosen.iterrows():
+
+                    medicine_ingredients = [
+                        item.strip()
+                        for item in str(
+                            medicine_row["Ingredient"]
+                        ).split("+")
+                    ]
+
+                    if ingredient in medicine_ingredients:
+
+                        medicines_with_ingredient.append(
+                            medicine_row["Medicine"]
+                        )
+
+                duplicate_details.append(
+                    {
+                        "ingredient": ingredient,
+                        "medicines": medicines_with_ingredient
+                    }
+                )
 # ==================================================
 # CATEGORY ANALYSIS
 # ==================================================
