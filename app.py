@@ -1325,13 +1325,9 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             # 10. PROFESSIONAL GUIDANCE & DISCLAIMER
             # ==================================================
 
-            st.subheader(
-                "👨‍⚕️ Professional Guidance"
-            )
-
             st.markdown(
                 """
-                SmartRx AI provides educational and
+                SmartRx AI provides health
                 decision-support information only.
 
                 It does not diagnose medical conditions,
@@ -1346,25 +1342,6 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             )
 
 
-            # ==========================================================
-            # FOOTER
-            # ==========================================================
-
-            st.markdown(
-                """
-                <div class="footer">
-
-                <strong>SmartRx AI © 2026</strong><br><br>
-
-                AI-Powered Medication & Herbal Safety Intelligence<br>
-
-                Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
-
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-            
             # ==========================================================
             # FOOTER
             # ==========================================================
