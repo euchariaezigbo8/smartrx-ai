@@ -823,7 +823,7 @@ elif page == "🔍 AI Safety Checker":
                 unsafe_allow_html=True
             )
 
-                        st.write(ai_explanation)
+            st.write(ai_explanation)
 
 
             # ==================================================
