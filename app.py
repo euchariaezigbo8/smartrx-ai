@@ -1268,7 +1268,8 @@ elif page == "🔍 AI Safety Checker":
                     )
 
 
-            # ==================================================
+                       # ==================================================
+                       # ==================================================
             # HERB–DRUG INTERACTION SCREENING
             # ==================================================
 
@@ -1331,9 +1332,24 @@ elif page == "🔍 AI Safety Checker":
                         ).strip()
 
 
-                        evidence = str(
-                            interaction["Evidence_Note"]
-                        ).strip()
+                        # ------------------------------------------
+                        # SAFE EVIDENCE NOTE
+                        # ------------------------------------------
+
+                        evidence = interaction.get(
+                            "Evidence_Note",
+                            interaction.get(
+                                "Evidence",
+                                "Structured interaction information from the SmartRx AI database."
+                            )
+                        )
+
+
+                        if pd.isna(evidence):
+                            evidence = (
+                                "Structured interaction information "
+                                "from the SmartRx AI database."
+                            )
 
 
                         affected_medicines = chosen[
@@ -1350,21 +1366,27 @@ elif page == "🔍 AI Safety Checker":
                             interaction_findings.append(
                                 {
                                     "herb": herb_name,
+
                                     "drug_class": drug_class,
+
                                     "medicines":
                                         affected_medicines[
                                             "Medicine"
                                         ].tolist(),
+
                                     "scientific_name":
                                         scientific_name,
+
                                     "active_compounds":
                                         active_compounds,
-                                    "risk": risk,
-                                    "evidence": evidence
+
+                                    "risk":
+                                        risk,
+
+                                    "evidence":
+                                        str(evidence)
                                 }
                             )
-
-
             # ==================================================
             # DISPLAY HERB–DRUG INTERACTIONS
             # ==================================================
