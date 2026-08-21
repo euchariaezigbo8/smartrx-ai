@@ -596,6 +596,9 @@ elif page == "🔍 AI Safety Checker":
 
     st.title("🔍 AI Safety Checker")
 
+    # ======================================================
+    # INTRODUCTION
+    # ======================================================
 
     st.markdown(
         """
@@ -608,9 +611,10 @@ elif page == "🔍 AI Safety Checker":
         <p>
         Select the medicines and Nigerian or Traditional African
         medicinal herbs you want SmartRx AI to analyse.
-        The system will screen the selected medicines for
+        The system screens the selected medicines and herbs for
         duplicate active ingredients, medicine-class conflicts,
-        stored safety warnings and herbal safety information.
+        potential herb–drug interactions, stored safety warnings
+        and major herbal active compounds.
         </p>
 
         </div>
@@ -620,7 +624,7 @@ elif page == "🔍 AI Safety Checker":
 
 
     # ======================================================
-    # MEDICINE SELECTION
+    # 1. SELECT MEDICINES
     # ======================================================
 
     st.subheader("💊 1. Select Your Medicines")
@@ -628,7 +632,6 @@ elif page == "🔍 AI Safety Checker":
     st.write(
         "You can select up to five medicines for safety screening."
     )
-
 
     selected_medicines = st.multiselect(
         "Choose medicines",
@@ -639,16 +642,17 @@ elif page == "🔍 AI Safety Checker":
 
 
     # ======================================================
-    # HERBAL MEDICINE SELECTION
+    # 2. SELECT HERBS
     # ======================================================
 
-    st.subheader("🌿 2. Select Nigerian / Traditional African Herbs")
+    st.subheader(
+        "🌿 2. Select Nigerian / Traditional African Herbs"
+    )
 
     st.write(
         "Select up to four Nigerian or Traditional African "
         "medicinal herbs for safety screening."
     )
-
 
     selected_herbs = st.multiselect(
         "Choose medicinal herbs",
@@ -659,465 +663,54 @@ elif page == "🔍 AI Safety Checker":
 
 
     # ======================================================
-    # SELECTED MEDICINES PREVIEW
+    # RUN SAFETY SCREENING
     # ======================================================
-
-    if selected_medicines:
-
-        st.subheader("📋 Selected Medicines")
-
-        selected_preview = medicines_df[
-            medicines_df["Medicine"].isin(selected_medicines)
-        ][
-            [
-                "Medicine",
-                "Ingredient",
-                "Category",
-                "Warning"
-            ]
-        ]
-
-        st.dataframe(
-            selected_preview,
-            use_container_width=True,
-            hide_index=True
-        )
-
-
-    # ======================================================
-    # SELECTED HERBS PREVIEW
-    # ======================================================
-
-    if selected_herbs:
-
-        st.subheader("🌿 Selected Herbs")
-
-        selected_herb_preview = herbs_df[
-            herbs_df["Herb"].isin(selected_herbs)
-        ][
-            [
-                "Herb",
-                "Scientific",
-                "Yoruba",
-                "Hausa",
-                "Igbo"
-            ]
-        ]
-
-        st.dataframe(
-            selected_herb_preview,
-            use_container_width=True,
-            hide_index=True
-        )
-
-
-    # ======================================================
-    # SAFETY VERIFICATION BUTTON
-    # ======================================================
-
-    st.markdown(
-        "<br>",
-        unsafe_allow_html=True
-    )
-
 
     if st.button(
-        "🤖  RUN AI SAFETY VERIFICATION",
+        "🤖 RUN AI SAFETY VERIFICATION",
         use_container_width=True
     ):
-
-        # ==================================================
-        # VALIDATION
-        # ==================================================
 
         if not selected_medicines:
 
             st.warning(
-                "⚠️ Please select at least one medicine "
-                "before running the safety verification."
+                "Please select at least one medicine."
             )
 
-            st.stop()
+        else:
 
+            # ==================================================
+            # SELECTED MEDICINES
+            # ==================================================
 
-        # ==================================================
-        # STRUCTURED MEDICINE SCREENING
-        # ==================================================
-
-        chosen = medicines_df[
-            medicines_df["Medicine"].isin(selected_medicines)
-        ].copy()
-
-
-        st.subheader("🔬 Safety Screening Results")
-
-
-        # ==================================================
-        # DUPLICATE INGREDIENT ANALYSIS
-        # ==================================================
-
-        ingredient_count = {}
-
-
-        for ingredient in chosen["Ingredient"].dropna():
-
-            ingredients = [
-                item.strip()
-                for item in str(ingredient).split("+")
-                if item.strip()
-            ]
-
-
-            for item in ingredients:
-
-                ingredient_count[item] = (
-                    ingredient_count.get(item, 0) + 1
+            chosen = medicines_df[
+                medicines_df["Medicine"].isin(
+                    selected_medicines
                 )
+            ].copy()
 
 
-        duplicates = [
-            ingredient
-            for ingredient, count in ingredient_count.items()
-            if count > 1
-        ]
+            st.subheader("📋 Selected Medicines")
 
 
-        # ==================================================
-        # MAP DUPLICATE INGREDIENTS TO MEDICINES
-        # ==================================================
-
-        duplicate_details = []
-
-
-        for ingredient in duplicates:
-
-            medicines_with_ingredient = []
-
-
-            for _, medicine_row in chosen.iterrows():
-
-                medicine_ingredients = [
-                    item.strip()
-                    for item in str(
-                        medicine_row["Ingredient"]
-                    ).split("+")
-                    if item.strip()
-                ]
-
-
-                if ingredient in medicine_ingredients:
-
-                    medicines_with_ingredient.append(
-                        medicine_row["Medicine"]
-                    )
-
-
-            duplicate_details.append(
-                {
-                    "ingredient": ingredient,
-                    "medicines": medicines_with_ingredient
-                }
-            )
-
-
-        # ==================================================
-        # CATEGORY ANALYSIS
-        # ==================================================
-
-        categories = (
-            chosen["Category"]
-            .dropna()
-            .astype(str)
-            .tolist()
-        )
-
-
-        category_warnings = []
-
-
-        if categories.count("NSAID") > 1:
-
-            category_warnings.append(
-                "Multiple NSAID medicines were selected. "
-                "Combining NSAIDs may increase the risk "
-                "of stomach irritation and bleeding."
-            )
-
-
-        # ==================================================
-        # MEDICINE-SPECIFIC WARNINGS
-        # ==================================================
-
-        medicine_warnings = []
-
-
-        for _, row in chosen.iterrows():
-
-            medicine_warnings.append(
-                {
-                    "medicine": row["Medicine"],
-                    "warning": row["Warning"]
-                }
-            )
-
-
-        # ==================================================
-        # HERBAL SAFETY INFORMATION
-        # ==================================================
-
-        selected_herb_data = herbs_df[
-            herbs_df["Herb"].isin(selected_herbs)
-        ].copy()
-
-
-        herbal_findings = []
-
-
-        for _, herb_row in selected_herb_data.iterrows():
-
-            scientific = herb_row["Scientific"]
-
-
-            if pd.isna(scientific) or not str(scientific).strip():
-
-                scientific = "Not available"
-
-
-            yoruba = herb_row["Yoruba"]
-
-
-            if pd.isna(yoruba) or not str(yoruba).strip():
-
-                yoruba = "Not available"
-
-
-            hausa = herb_row["Hausa"]
-
-
-            if pd.isna(hausa) or not str(hausa).strip():
-
-                hausa = "Not available"
-
-
-            igbo = herb_row["Igbo"]
-
-
-            if pd.isna(igbo) or not str(igbo).strip():
-
-                igbo = "Not available"
-
-
-            safety_caution = herb_row["Safety_Caution"]
-
-active_compounds = herb_row["Active_Compounds"]
-
-if pd.isna(active_compounds) or not str(active_compounds).strip():
-
-    active_compounds = "Not available"
-
-if (
-    pd.isna(safety_caution)
-    or not str(safety_caution).strip()
-):
-    safety_caution = (
-        "No safety caution available."
-    )
-
-
-            traditional_names = (
-                f"Yoruba: {yoruba} • "
-                f"Hausa: {hausa} • "
-                f"Igbo: {igbo}"
-            )
-
-
-            herbal_findings.append(
-    {
-        "herb": herb_row["Herb"],
-        "scientific_name": scientific,
-        "traditional_names": traditional_names,
-        "active_compounds": active_compounds,
-        "safety_caution": safety_caution
-    }
-)
-# ==================================================
-# HERB–DRUG INTERACTION ANALYSIS
-# ==================================================
-
-interaction_findings = []
-
-# Drug classes from the selected medicines
-selected_classes = (
-    chosen["Category"]
-    .dropna()
-    .unique()
-    .tolist()
-)
-
-for _, herb in selected_herb_data.iterrows():
-
-    herb_name = herb["Herb"]
-
-    matches = interactions_df[
-        (interactions_df["Herb"] == herb_name) &
-        (interactions_df["Drug_Class"].isin(selected_classes))
-    ]
-
-    for _, match in matches.iterrows():
-
-        medicines = chosen[
-            chosen["Category"] == match["Drug_Class"]
-        ]["Medicine"].tolist()
-
-        interaction_findings.append(
-            {
-                "herb": herb_name,
-                "drug_class": match["Drug_Class"],
-                "risk": match["Risk"],
-                "evidence": match["Evidence"],
-                "active_compounds": herb["Active_Compounds"],
-                "scientific_name": herb["Scientific"],
-                "medicines": medicines
-            }
-        )
-
-        # ==================================================
-# STRUCTURED SMART RX AI FINDINGS
-# ==================================================
-
-safety_findings = {
-
-    "selected_medicines":
-        selected_medicines,
-
-    "duplicate_active_ingredients":
-        duplicate_details,
-
-    "category_warnings":
-        category_warnings,
-
-    "medicine_warnings":
-        medicine_warnings,
-
-    "selected_herbs":
-        herbal_findings,
-
-    "interaction_findings":
-        interaction_findings
-}
-
-
-        # ==================================================
-        # DISPLAY DUPLICATE FINDINGS
-        # ==================================================
-
-        if duplicates:
-
-            st.markdown(
-                """
-                <div class="danger">
-
-                <h3>
-                🚨 Duplicate Active Ingredient Detected
-                </h3>
-
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
-
-
-            for duplicate_detail in duplicate_details:
-
-                ingredient = duplicate_detail["ingredient"]
-
-                medicines = duplicate_detail["medicines"]
-
-
-                st.write(
-                    f"**Duplicate Active Ingredient: "
-                    f"{ingredient}**"
-                )
-
-
-                st.write(
-                    "Found in: "
-                    + ", ".join(medicines)
-                )
-
-
-       # ==================================================
-# DISPLAY CATEGORY WARNINGS
-# ==================================================
-
-if category_warnings:
-
-    st.markdown(
-        """
-        <div class="warning">
-
-        <h3>
-        ⚠️ Medicine Combination Warning
-        </h3>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    for warning in category_warnings:
-
-        st.write(warning)
-
-        # Show the actual medicines involved
-        if categories.count("NSAID") > 1:
-
-            nsaid_medicines = chosen[
-                chosen["Category"].astype(str).str.strip().str.upper()
-                == "NSAID"
-            ]
-
-            if not nsaid_medicines.empty:
+            for _, row in chosen.iterrows():
 
                 st.markdown(
-                    """
+                    f"""
                     <div class="section">
 
-                    <h4 style="color:#DC2626;">
-                    💊 NSAID Medicines Detected
+                    <h4 style="color:#4338CA;">
+                    💊 {row["Medicine"]}
                     </h4>
 
-                    """,
-                    unsafe_allow_html=True
-                )
-
-                for _, nsaid_row in nsaid_medicines.iterrows():
-
-                    st.markdown(
-                        f"""
-                        <p>
-                        <strong>Medicine:</strong>
-                        {nsaid_row["Medicine"]}
-                        <br>
-
-                        <strong>Active Ingredient:</strong>
-                        {nsaid_row["Ingredient"]}
-                        <br>
-
-                        <strong>Drug Class:</strong>
-                        {nsaid_row["Category"]}
-                        </p>
-                        """,
-                        unsafe_allow_html=True
-                    )
-
-                st.markdown(
-                    """
                     <p>
-                    <strong>Safety Note:</strong>
-                    Multiple NSAID medicines were selected.
-                    Combining NSAIDs may increase the risk of
-                    stomach irritation and bleeding.
+                    <strong>Active Ingredient:</strong>
+                    {row["Ingredient"]}
+                    </p>
+
+                    <p>
+                    <strong>Category:</strong>
+                    {row["Category"]}
                     </p>
 
                     </div>
@@ -1126,228 +719,748 @@ if category_warnings:
                 )
 
 
-# ==================================================
-# DISPLAY MEDICINE WARNINGS
-# ==================================================
+            # ==================================================
+            # SELECTED HERBS
+            # ==================================================
 
-if medicine_warnings:
-
-    st.subheader("💊 Medicine Findings")
-
-    for finding in medicine_warnings:
-
-        st.markdown(
-            f"""
-            <div class="section">
-
-            <h4 style="color:#4338CA;">
-            💊 {finding["medicine"]}
-            </h4>
-
-            <p>
-            <strong>Safety Information:</strong>
-            {finding["warning"]}
-            </p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            selected_herb_data = herbs_df[
+                herbs_df["Herb"].isin(selected_herbs)
+            ].copy()
 
 
-# ==================================================
-# NO MAJOR RULE-BASED ISSUE
-# ==================================================
+            if not selected_herb_data.empty:
 
-if not duplicates and not category_warnings:
-
-    st.markdown(
-        """
-        <div class="safe">
-
-        <h3>
-        ✅ No Major Issue Detected by Current Rules
-        </h3>
-
-        <p>
-        No duplicate active ingredients or multiple-NSAID
-        conflicts were identified by the current
-        structured screening rules.
-        </p>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+                st.subheader("🌿 Selected Herbs")
 
 
-# ==================================================
-# HERBAL SAFETY FINDINGS
-# ==================================================
+                for _, herb_row in selected_herb_data.iterrows():
 
-if herbal_findings:
+                    scientific = herb_row["Scientific"]
+                    active_compounds = herb_row["Active_Compounds"]
 
-    st.subheader("🌿 Herbal Safety Findings")
+                    if pd.isna(scientific) or not str(scientific).strip():
+                        scientific = "Not available"
 
-    for herb in herbal_findings:
+                    if (
+                        pd.isna(active_compounds)
+                        or not str(active_compounds).strip()
+                    ):
+                        active_compounds = "Not available"
 
-        st.markdown(
-            f"""
-            <div class="section">
+                    st.markdown(
+                        f"""
+                        <div class="section">
 
-            <h3 style="color:#4338CA;">
-            🌿 {herb["herb"]}
-            </h3>
+                        <h4 style="color:#4338CA;">
+                        🌿 {herb_row["Herb"]}
+                        </h4>
 
-            <p>
-            <strong>Scientific Name:</strong>
-            {herb["scientific_name"]}
-            </p>
+                        <p>
+                        <strong>Scientific Name:</strong>
+                        <em>{scientific}</em>
+                        </p>
 
-            <p>
-            <strong>Traditional Names:</strong>
-            {herb["traditional_names"]}
-            </p>
+                        <p>
+                        <strong>Major Active Compounds:</strong>
+                        {active_compounds}
+                        </p>
 
-            <p>
-            <strong>Major Active Compounds:</strong>
-            {herb["active_compounds"]}
-            </p>
-
-            <p>
-            <strong>Safety Caution:</strong>
-            {herb["safety_caution"]}
-            </p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-
-# ==================================================
-# POTENTIAL HERB–DRUG INTERACTIONS
-# ==================================================
-
-if interaction_findings:
-
-    st.subheader("🚨 Potential Herb–Drug Interactions")
-
-    for item in interaction_findings:
-
-        if item["risk"] == "High":
-            border = "#DC2626"
-
-        elif item["risk"] == "Moderate":
-            border = "#F59E0B"
-
-        else:
-            border = "#16A34A"
-
-        st.markdown(
-            f"""
-            <div style="
-                background:white;
-                border-left:8px solid {border};
-                padding:20px;
-                border-radius:15px;
-                margin-bottom:18px;
-                box-shadow:0 4px 12px rgba(0,0,0,0.08);
-            ">
-
-            <h4 style="color:{border}; margin-top:0;">
-            🚨 {item["herb"]} + {item["drug_class"]} Medicines
-            </h4>
-
-            <p>
-            <strong>Orthodox Medicines:</strong>
-            {", ".join(item["medicines"])}
-            </p>
-
-            <p>
-            <strong>Scientific Name:</strong>
-            <em>{item["scientific_name"]}</em>
-            </p>
-
-            <p>
-            <strong>Major Active Compounds:</strong>
-            {item["active_compounds"]}
-            </p>
-
-            <p>
-            <strong>Risk Level:</strong>
-            {item["risk"]}
-            </p>
-
-            <p>
-            <strong>Evidence Note:</strong>
-            {item["evidence"]}
-            </p>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-# ==================================================
-# AI EXPLANATION
-# ==================================================
-
-st.subheader("🤖 AI Safety Explanation")
-
-        with st.spinner(
-            "SmartRx AI is generating a safety explanation..."
-        ):
-
-            try:
-
-                ai_explanation = (
-                    generate_ai_explanation(
-                        safety_findings
+                        </div>
+                        """,
+                        unsafe_allow_html=True
                     )
+
+
+            # ==================================================
+            # SAFETY SCREENING RESULTS
+            # ==================================================
+
+            st.subheader("🔬 Safety Screening Results")
+
+
+            # ==================================================
+            # DUPLICATE ACTIVE INGREDIENT ANALYSIS
+            # ==================================================
+
+            ingredient_count = {}
+
+            for ingredient in chosen["Ingredient"].dropna():
+
+                ingredients = [
+                    item.strip()
+                    for item in str(ingredient).split("+")
+                    if item.strip()
+                ]
+
+                for item in ingredients:
+
+                    ingredient_count[item] = (
+                        ingredient_count.get(item, 0) + 1
+                    )
+
+
+            duplicates = [
+                ingredient
+                for ingredient, count
+                in ingredient_count.items()
+                if count > 1
+            ]
+
+
+            duplicate_details = []
+
+
+            for ingredient in duplicates:
+
+                medicines_with_ingredient = []
+
+                for _, medicine_row in chosen.iterrows():
+
+                    medicine_ingredients = [
+                        item.strip()
+                        for item in str(
+                            medicine_row["Ingredient"]
+                        ).split("+")
+                        if item.strip()
+                    ]
+
+                    if ingredient in medicine_ingredients:
+
+                        medicines_with_ingredient.append(
+                            medicine_row["Medicine"]
+                        )
+
+
+                duplicate_details.append(
+                    {
+                        "ingredient": ingredient,
+                        "medicines": medicines_with_ingredient
+                    }
                 )
 
-            except Exception as error:
 
-                ai_explanation = (
-                    "The structured safety screening was "
-                    "completed, but the AI explanation could "
-                    "not be generated at this time."
+            # ==================================================
+            # DUPLICATE INGREDIENT DISPLAY
+            # ==================================================
+
+            if duplicates:
+
+                st.markdown(
+                    """
+                    <div class="danger">
+
+                    <h3>
+                    🚨 Duplicate Active Ingredient Detected
+                    </h3>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
                 )
 
-                st.warning(
-                    "AI explanation service temporarily "
-                    "unavailable. The structured screening "
-                    "results above are still available."
+
+                for duplicate_detail in duplicate_details:
+
+                    st.write(
+                        f"**Duplicate Active Ingredient: "
+                        f"{duplicate_detail['ingredient']}**"
+                    )
+
+                    st.write(
+                        "Found in: "
+                        + ", ".join(
+                            duplicate_detail["medicines"]
+                        )
+                    )
+
+
+            # ==================================================
+            # CATEGORY ANALYSIS
+            # ==================================================
+
+            categories = (
+                chosen["Category"]
+                .dropna()
+                .astype(str)
+                .str.strip()
+                .str.upper()
+                .tolist()
+            )
+
+
+            category_warnings = []
+
+
+            # ==================================================
+            # NSAID DETECTION
+            # ==================================================
+
+            nsaid_medicines = chosen[
+                chosen["Category"]
+                .astype(str)
+                .str.strip()
+                .str.upper()
+                .eq("NSAID")
+            ].copy()
+
+
+            if len(nsaid_medicines) > 1:
+
+                nsaid_names = nsaid_medicines[
+                    "Medicine"
+                ].tolist()
+
+
+                category_warnings.append(
+                    "Multiple NSAID medicines were selected. "
+                    "Combining NSAIDs may increase the risk "
+                    "of stomach irritation and bleeding."
                 )
 
 
-        st.markdown(
-            """
-            <div class="ai-box">
+            # ==================================================
+            # MEDICINE WARNINGS
+            # ==================================================
 
-            <h3 style="color:#4338CA;">
-            🤖 Meta AI Safety Explanation
-            </h3>
+            medicine_warnings = []
 
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            for _, row in chosen.iterrows():
+
+                warning = row["Warning"]
+
+                if pd.isna(warning):
+
+                    warning = "No specific warning available."
+
+                medicine_warnings.append(
+                    {
+                        "medicine": row["Medicine"],
+                        "ingredient": row["Ingredient"],
+                        "category": row["Category"],
+                        "warning": warning
+                    }
+                )
 
 
-        st.write(ai_explanation)
+            # ==================================================
+            # DISPLAY CATEGORY WARNINGS
+            # ==================================================
+
+            if category_warnings:
+
+                st.markdown(
+                    """
+                    <div class="warning">
+
+                    <h3>
+                    ⚠️ Medicine Combination Warning
+                    </h3>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
 
-        # ==================================================
-        # DISCLAIMER
-        # ==================================================
+                for warning in category_warnings:
 
-        st.info(
-            "⚠️ SmartRx AI provides educational and "
-            "decision-support information only. It does "
-            "not diagnose medical conditions or replace "
-            "a qualified doctor or pharmacist."
-        )
+                    st.write(warning)
+
+
+                if len(nsaid_medicines) > 1:
+
+                    st.markdown(
+                        """
+                        <div class="section">
+
+                        <h4 style="color:#DC2626;">
+                        💊 NSAID Medicines Detected
+                        </h4>
+
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+
+                    for _, row in nsaid_medicines.iterrows():
+
+                        st.markdown(
+                            f"""
+                            <p>
+                            <strong>Medicine:</strong>
+                            {row["Medicine"]}
+                            <br>
+
+                            <strong>Active Ingredient:</strong>
+                            {row["Ingredient"]}
+                            <br>
+
+                            <strong>Drug Class:</strong>
+                            {row["Category"]}
+                            </p>
+                            """,
+                            unsafe_allow_html=True
+                        )
+
+
+                    st.markdown(
+                        """
+                        <p>
+                        <strong>Safety Note:</strong>
+                        Multiple NSAID medicines were selected.
+                        Combining NSAIDs may increase the risk
+                        of stomach irritation and bleeding.
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+
+            # ==================================================
+            # MEDICINE FINDINGS
+            # ==================================================
+
+            if medicine_warnings:
+
+                st.subheader("💊 Medicine Findings")
+
+
+                for finding in medicine_warnings:
+
+                    st.markdown(
+                        f"""
+                        <div class="section">
+
+                        <h4 style="color:#4338CA;">
+                        💊 {finding["medicine"]}
+                        </h4>
+
+                        <p>
+                        <strong>Active Ingredient:</strong>
+                        {finding["ingredient"]}
+                        </p>
+
+                        <p>
+                        <strong>Drug Class:</strong>
+                        {finding["category"]}
+                        </p>
+
+                        <p>
+                        <strong>Safety Information:</strong>
+                        {finding["warning"]}
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+
+            # ==================================================
+            # HERBAL SAFETY INFORMATION
+            # ==================================================
+
+            herbal_findings = []
+
+
+            for _, herb_row in selected_herb_data.iterrows():
+
+                scientific = herb_row["Scientific"]
+
+                active_compounds = herb_row["Active_Compounds"]
+
+                yoruba = herb_row["Yoruba"]
+
+                hausa = herb_row["Hausa"]
+
+                igbo = herb_row["Igbo"]
+
+                safety_caution = herb_row["Safety_Caution"]
+
+
+                if pd.isna(scientific) or not str(scientific).strip():
+                    scientific = "Not available"
+
+                if (
+                    pd.isna(active_compounds)
+                    or not str(active_compounds).strip()
+                ):
+                    active_compounds = "Not available"
+
+                if pd.isna(yoruba) or not str(yoruba).strip():
+                    yoruba = "Not available"
+
+                if pd.isna(hausa) or not str(hausa).strip():
+                    hausa = "Not available"
+
+                if pd.isna(igbo) or not str(igbo).strip():
+                    igbo = "Not available"
+
+                if (
+                    pd.isna(safety_caution)
+                    or not str(safety_caution).strip()
+                ):
+                    safety_caution = (
+                        "No safety caution available."
+                    )
+
+
+                traditional_names = (
+                    f"Yoruba: {yoruba} • "
+                    f"Hausa: {hausa} • "
+                    f"Igbo: {igbo}"
+                )
+
+
+                herbal_findings.append(
+                    {
+                        "herb": herb_row["Herb"],
+                        "scientific_name": scientific,
+                        "traditional_names": traditional_names,
+                        "active_compounds": active_compounds,
+                        "safety_caution": safety_caution
+                    }
+                )
+
+
+            # ==================================================
+            # HERBAL SAFETY FINDINGS
+            # ==================================================
+
+            if herbal_findings:
+
+                st.subheader(
+                    "🌿 Herbal Safety Findings"
+                )
+
+
+                for herb in herbal_findings:
+
+                    st.markdown(
+                        f"""
+                        <div class="section">
+
+                        <h3 style="color:#4338CA;">
+                        🌿 {herb["herb"]}
+                        </h3>
+
+                        <p>
+                        <strong>Scientific Name:</strong>
+                        <em>{herb["scientific_name"]}</em>
+                        </p>
+
+                        <p>
+                        <strong>Traditional Names:</strong>
+                        {herb["traditional_names"]}
+                        </p>
+
+                        <p>
+                        <strong>Major Active Compounds:</strong>
+                        {herb["active_compounds"]}
+                        </p>
+
+                        <p>
+                        <strong>Safety Caution:</strong>
+                        {herb["safety_caution"]}
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+
+            # ==================================================
+            # HERB–DRUG INTERACTION SCREENING
+            # ==================================================
+
+            interaction_findings = []
+
+
+            if not selected_herb_data.empty:
+
+                for _, herb_row in selected_herb_data.iterrows():
+
+                    herb_name = herb_row["Herb"]
+
+                    interaction_class = (
+                        herb_row["Interaction_Class"]
+                    )
+
+                    active_compounds = (
+                        herb_row["Active_Compounds"]
+                    )
+
+                    scientific_name = (
+                        herb_row["Scientific"]
+                    )
+
+
+                    if pd.isna(interaction_class):
+                        interaction_class = ""
+
+                    if pd.isna(active_compounds):
+                        active_compounds = "Not available"
+
+                    if pd.isna(scientific_name):
+                        scientific_name = "Not available"
+
+
+                    interaction_class = str(
+                        interaction_class
+                    ).strip()
+
+
+                    if not interaction_class:
+                        continue
+
+
+                    herb_interactions = interactions_df[
+                        interactions_df["Herb"].astype(str).str.strip()
+                        == str(herb_name).strip()
+                    ]
+
+
+                    for _, interaction in herb_interactions.iterrows():
+
+                        drug_class = str(
+                            interaction["Drug_Class"]
+                        ).strip()
+
+
+                        risk = str(
+                            interaction["Risk"]
+                        ).strip()
+
+
+                        evidence = str(
+                            interaction["Evidence_Note"]
+                        ).strip()
+
+
+                        affected_medicines = chosen[
+                            chosen["Category"]
+                            .astype(str)
+                            .str.strip()
+                            .str.upper()
+                            .eq(drug_class.upper())
+                        ]
+
+
+                        if not affected_medicines.empty:
+
+                            interaction_findings.append(
+                                {
+                                    "herb": herb_name,
+                                    "drug_class": drug_class,
+                                    "medicines":
+                                        affected_medicines[
+                                            "Medicine"
+                                        ].tolist(),
+                                    "scientific_name":
+                                        scientific_name,
+                                    "active_compounds":
+                                        active_compounds,
+                                    "risk": risk,
+                                    "evidence": evidence
+                                }
+                            )
+
+
+            # ==================================================
+            # DISPLAY HERB–DRUG INTERACTIONS
+            # ==================================================
+
+            if interaction_findings:
+
+                st.subheader(
+                    "🚨 Potential Herb–Drug Interactions"
+                )
+
+
+                for item in interaction_findings:
+
+                    if item["risk"].lower() == "high":
+                        border = "#DC2626"
+
+                    elif item["risk"].lower() == "moderate":
+                        border = "#F59E0B"
+
+                    else:
+                        border = "#16A34A"
+
+
+                    st.markdown(
+                        f"""
+                        <div style="
+                            background:white;
+                            border-left:8px solid {border};
+                            padding:20px;
+                            border-radius:15px;
+                            margin-bottom:18px;
+                            box-shadow:
+                            0 4px 12px rgba(0,0,0,0.08);
+                        ">
+
+                        <h4 style="color:{border};">
+                        🚨 {item["herb"]} +
+                        {item["drug_class"]} Medicines
+                        </h4>
+
+                        <p>
+                        <strong>Orthodox Medicines:</strong>
+                        {", ".join(item["medicines"])}
+                        </p>
+
+                        <p>
+                        <strong>Scientific Name:</strong>
+                        <em>{item["scientific_name"]}</em>
+                        </p>
+
+                        <p>
+                        <strong>Major Active Compounds:</strong>
+                        {item["active_compounds"]}
+                        </p>
+
+                        <p>
+                        <strong>Risk Level:</strong>
+                        {item["risk"]}
+                        </p>
+
+                        <p>
+                        <strong>Evidence Note:</strong>
+                        {item["evidence"]}
+                        </p>
+
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+
+            # ==================================================
+            # NO MAJOR RULE-BASED ISSUE
+            # ==================================================
+
+            if (
+                not duplicates
+                and not category_warnings
+                and not interaction_findings
+            ):
+
+                st.markdown(
+                    """
+                    <div class="safe">
+
+                    <h3>
+                    ✅ No Major Issue Detected by Current Rules
+                    </h3>
+
+                    <p>
+                    No duplicate active ingredients,
+                    multiple-NSAID conflicts or stored
+                    herb–drug interaction flags were
+                    identified by the current structured
+                    screening rules.
+                    </p>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+
+            # ==================================================
+            # STRUCTURED SMART RX AI FINDINGS
+            # ==================================================
+
+            safety_findings = {
+
+                "selected_medicines":
+                    selected_medicines,
+
+                "duplicate_active_ingredients":
+                    duplicate_details,
+
+                "category_warnings":
+                    category_warnings,
+
+                "medicine_warnings":
+                    medicine_warnings,
+
+                "herb_drug_interactions":
+                    interaction_findings,
+
+                "selected_herbs":
+                    herbal_findings
+            }
+
+
+            # ==================================================
+            # AI SAFETY EXPLANATION
+            # ==================================================
+
+            st.subheader(
+                "🤖 AI Safety Explanation"
+            )
+
+
+            with st.spinner(
+                "SmartRx AI is generating a safety explanation..."
+            ):
+
+                try:
+
+                    ai_explanation = (
+                        generate_ai_explanation(
+                            safety_findings
+                        )
+                    )
+
+                except Exception:
+
+                    ai_explanation = (
+                        "The structured safety screening was "
+                        "completed, but the AI explanation "
+                        "could not be generated at this time."
+                    )
+
+                    st.warning(
+                        "AI explanation service is temporarily "
+                        "unavailable. The structured screening "
+                        "results above are still available."
+                    )
+
+
+            st.markdown(
+                """
+                <div class="ai-box">
+
+                <h3 style="color:#4338CA;">
+                🤖 Meta AI Safety Explanation
+                </h3>
+
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+
+            st.write(ai_explanation)
+
+
+            # ==================================================
+            # DISCLAIMER
+            # ==================================================
+
+            st.info(
+                "⚠️ SmartRx AI provides educational and "
+                "decision-support information only. It does "
+                "not diagnose medical conditions or replace "
+                "a qualified doctor or pharmacist."
+            )
 
 
 # ==========================================================
