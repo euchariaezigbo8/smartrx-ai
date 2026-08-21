@@ -786,6 +786,55 @@ elif page == "🔍 AI Safety Checker":
                 )
 
                         # ==================================================
+# PREPARE HERB–DRUG INTERACTIONS FOR AI ANALYSIS
+# ==================================================
+
+interaction_findings = []
+
+if not selected_herb_data.empty:
+
+    for _, herb_row in selected_herb_data.iterrows():
+
+        herb_interactions = interactions_df[
+            interactions_df["Herb"].astype(str).str.strip()
+            == str(herb_row["Herb"]).strip()
+        ]
+
+        for _, interaction in herb_interactions.iterrows():
+
+            drug_class = str(
+                interaction["Drug_Class"]
+            ).strip()
+
+            matched = chosen[
+                chosen["Category"]
+                .astype(str)
+                .str.strip()
+                .str.lower()
+                .str.rstrip("s")
+                .eq(drug_class.lower().rstrip("s"))
+            ]
+
+            if not matched.empty:
+
+                interaction_findings.append(
+                    {
+                        "herb": herb_row["Herb"],
+                        "drug_class": drug_class,
+                        "medicines": matched["Medicine"].tolist(),
+                        "scientific_name": herb_row["Scientific"],
+                        "active_compounds": herb_row["Active_Compounds"],
+                        "risk": interaction["Risk"],
+                        "evidence": interaction.get(
+                            "Evidence_Note",
+                            interaction.get(
+                                "Evidence",
+                                "Structured interaction information from the SmartRx AI database."
+                            )
+                        )
+                    }
+                )
+                # ==================================================
             # AI CLINICAL SAFETY ANALYSIS
             # ==================================================
 
@@ -1179,71 +1228,7 @@ SmartRx AI recommends professional review before combining products with overlap
                     }
                 )
 
-
-            
-                                   # ==================================================
-            # HERB–DRUG INTERACTION SCREENING
-            # ==================================================
-
-            interaction_findings = []
-
-            if not selected_herb_data.empty:
-
-                for _, herb_row in selected_herb_data.iterrows():
-
-                    herb_name = herb_row["Herb"]
-                    scientific_name = herb_row["Scientific"]
-                    active_compounds = herb_row["Active_Compounds"]
-
-                    herb_interactions = interactions_df[
-                        interactions_df["Herb"].astype(str).str.strip()
-                        == str(herb_name).strip()
-                    ]
-
-                    for _, interaction in herb_interactions.iterrows():
-
-                        drug_class = str(
-                            interaction["Drug_Class"]
-                        ).strip()
-
-                        risk = str(
-                            interaction["Risk"]
-                        ).strip()
-
-                        evidence = interaction.get(
-                            "Evidence_Note",
-                            interaction.get(
-                                "Evidence",
-                                "Structured interaction information from the SmartRx AI database."
-                            )
-                        )
-
-                        affected_medicines = chosen[
-                            chosen["Category"]
-                            .astype(str)
-                            .str.strip()
-                            .str.lower()
-                            .str.rstrip("s")
-                            .eq(drug_class.lower().rstrip("s"))
-                        ]
-
-                        if not affected_medicines.empty:
-
-                            interaction_findings.append(
-                                {
-                                    "herb": herb_name,
-                                    "drug_class": drug_class,
-                                    "medicines": affected_medicines[
-                                        "Medicine"
-                                    ].tolist(),
-                                    "scientific_name": scientific_name,
-                                    "active_compounds": active_compounds,
-                                    "risk": risk,
-                                    "evidence": str(evidence)
-                                }
-                            )
-
-
+                                   
             # ==================================================
             # NO MAJOR RULE-BASED ISSUE
             # ==================================================
