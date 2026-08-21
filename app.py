@@ -522,122 +522,148 @@ elif page == "🔍 AI Safety Checker":
             )
 
                         # ==================================================
-            # DUPLICATE INGREDIENT ANALYSIS
-            # ==================================================
+# DUPLICATE INGREDIENT ANALYSIS
+# ==================================================
 
-            ingredient_count = {}
+ingredient_count = {}
 
-            # Count each individual active ingredient
-            for ingredient in chosen["Ingredient"].dropna():
+for ingredient in chosen["Ingredient"].dropna():
 
-                ingredients = [
-                    item.strip()
-                    for item in str(ingredient).split("+")
-                ]
+    ingredients = [
+        item.strip()
+        for item in str(ingredient).split("+")
+    ]
 
-                for item in ingredients:
+    for item in ingredients:
 
-                    ingredient_count[item] = (
-                        ingredient_count.get(item, 0) + 1
-                    )
-
-            # Identify ingredients appearing in more than one medicine
-            duplicates = [
-                ingredient
-                for ingredient, count in ingredient_count.items()
-                if count > 1
-            ]
-
-            # Store the medicines responsible for each duplicate
-            duplicate_details = []
-
-            for ingredient in duplicates:
-
-                medicines_with_ingredient = []
-
-                for _, medicine_row in chosen.iterrows():
-
-                    medicine_ingredients = [
-                        item.strip()
-                        for item in str(
-                            medicine_row["Ingredient"]
-                        ).split("+")
-                    ]
-
-                    if ingredient in medicine_ingredients:
-
-                        medicines_with_ingredient.append(
-                            medicine_row["Medicine"]
-                        )
-
-                duplicate_details.append(
-                    {
-                        "ingredient": ingredient,
-                        "medicines": medicines_with_ingredient
-                    }
-                )
-
-            # ==================================================
-            # CATEGORY ANALYSIS
-            # ==================================================
-
-            categories = (
-                chosen["Category"]
-                .dropna()
-                .tolist()
+        if item:
+            ingredient_count[item] = (
+                ingredient_count.get(item, 0) + 1
             )
 
-            category_warnings = []
 
-            if categories.count("NSAID") > 1:
+duplicates = [
+    ingredient
+    for ingredient, count
+    in ingredient_count.items()
+    if count > 1
+]
 
-                category_warnings.append(
-                    "Multiple NSAID medicines were selected. "
-                    "Combining NSAIDs may increase the risk "
-                    "of stomach irritation and bleeding."
-                )
 
-            # ==================================================
-            # HERBAL SAFETY INFORMATION
-            # ==================================================
+# ==================================================
+# MAP DUPLICATE INGREDIENTS TO MEDICINES
+# ==================================================
 
-            selected_herb_data = herbs_df[
-                herbs_df["Herb"].isin(selected_herbs)
-            ]
+duplicate_details = []
 
-            herbal_findings = []
+for ingredient in duplicates:
 
-            for _, herb_row in selected_herb_data.iterrows():
+    medicines_with_ingredient = []
 
-                                herbal_findings.append(
-                    {
-                        "herb": herb_row["Herb"],
-                        "scientific_name": herb_row["Scientific"],
-                        "traditional_use": (
-                            f'Yoruba: {herb_row["Yoruba"]} • '
-                            f'Hausa: {herb_row["Hausa"]} • '
-                            f'Igbo: {herb_row["Igbo"]}'
-                        ),
-                        "warning": herb_row["Safety_Caution"]
-                    }
-                )
-            # ==================================================
-            # STRUCTURED SAFETY FINDINGS
-            # ==================================================
+    for _, medicine_row in chosen.iterrows():
 
-            safety_findings = {
-                "selected_medicines": selected_medicines,
-                "duplicate_active_ingredients": duplicates,
-                "category_warnings": category_warnings,
-                "medicine_warnings": [
-                    {
-                        "medicine": row["Medicine"],
-                        "warning": row["Warning"]
-                    }
-                    for _, row in chosen.iterrows()
-                ],
-                "selected_herbs": herbal_findings
-            }
+        medicine_ingredients = [
+            item.strip()
+            for item in str(
+                medicine_row["Ingredient"]
+            ).split("+")
+        ]
+
+        if ingredient in medicine_ingredients:
+
+            medicines_with_ingredient.append(
+                medicine_row["Medicine"]
+            )
+
+    duplicate_details.append(
+        {
+            "ingredient": ingredient,
+            "medicines": medicines_with_ingredient
+        }
+    )
+
+
+# ==================================================
+# CATEGORY ANALYSIS
+# ==================================================
+
+categories = (
+    chosen["Category"]
+    .dropna()
+    .tolist()
+)
+
+category_warnings = []
+
+if categories.count("NSAID") > 1:
+
+    category_warnings.append(
+        "Multiple NSAID medicines were selected. "
+        "Combining NSAIDs may increase the risk "
+        "of stomach irritation and bleeding."
+    )
+
+
+# ==================================================
+# HERBAL SAFETY INFORMATION
+# ==================================================
+
+selected_herb_data = herbs_df[
+    herbs_df["Herb"].isin(selected_herbs)
+]
+
+herbal_findings = []
+
+for _, herb_row in selected_herb_data.iterrows():
+
+    scientific = (
+        herb_row.get("Scientific")
+        or "Not available"
+    )
+
+    traditional_names = (
+        f'Yoruba: {herb_row.get("Yoruba", "Not available")} • '
+        f'Hausa: {herb_row.get("Hausa", "Not available")} • '
+        f'Igbo: {herb_row.get("Igbo", "Not available")}'
+    )
+
+    safety_caution = (
+        herb_row.get("Safety_Caution")
+        or "No safety caution available."
+    )
+
+    herbal_findings.append(
+        {
+            "herb": herb_row["Herb"],
+            "scientific_name": scientific,
+            "traditional_names": traditional_names,
+            "safety_caution": safety_caution
+        }
+    )
+
+
+# ==================================================
+# STRUCTURED SMART RX AI FINDINGS
+# ==================================================
+
+safety_findings = {
+
+    "selected_medicines": selected_medicines,
+
+    "duplicate_active_ingredients": duplicate_details,
+
+    "category_warnings": category_warnings,
+
+    "medicine_warnings": [
+        {
+            "medicine": row["Medicine"],
+            "warning": row["Warning"]
+        }
+        for _, row in chosen.iterrows()
+    ],
+
+    "selected_herbs": herbal_findings
+}
             # ==================================================
             # DISPLAY STRUCTURED FINDINGS
             # ==================================================
