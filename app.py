@@ -823,7 +823,7 @@ elif page == "🔍 AI Safety Checker":
                 unsafe_allow_html=True
             )
 
-            st.write(ai_explanation)
+                        st.write(ai_explanation)
 
 
             # ==================================================
@@ -836,3 +836,23 @@ elif page == "🔍 AI Safety Checker":
                 "not diagnose medical conditions or replace "
                 "a qualified doctor or pharmacist."
             )
+
+
+# ==========================================================
+# FOOTER
+# ==========================================================
+
+st.markdown(
+    """
+    <div class="footer">
+
+    <strong>SmartRx AI © 2026</strong><br>
+
+    AI-Powered Medication & Herbal Safety Intelligence<br>
+
+    Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
+
+    </div>
+    """,
+    unsafe_allow_html=True
+)
