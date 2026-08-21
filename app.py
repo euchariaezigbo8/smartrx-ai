@@ -867,13 +867,7 @@ elif page == "🔍 AI Safety Checker":
                             duplicate_detail["medicines"]
                         )
                     )
-            # ==================================================
-            # SAFETY SCREENING RESULTS
-            # ==================================================
-
-            st.subheader("🔬 Safety Screening Results")
-
-
+            
             # ==================================================
             # DUPLICATE ACTIVE INGREDIENT ANALYSIS
             # ==================================================
