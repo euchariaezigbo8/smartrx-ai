@@ -1276,12 +1276,12 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             }
 
 
-            # ==================================================
+                       # ==================================================
             # 9. AI SAFETY EXPLANATION
             # ==================================================
 
             st.subheader(
-                "🤖 AI Safety Explanation"
+                "🤖 SmartRx AI Analysis"
             )
 
             with st.spinner(
@@ -1316,14 +1316,19 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
                 unsafe_allow_html=True
             )
 
+
             st.markdown(
                 ai_explanation
             )
 
 
-                        # ==================================================
-            # 10. PROFESSIONAL GUIDANCE & DISCLAIMER
             # ==================================================
+            # 10. PROFESSIONAL GUIDANCE
+            # ==================================================
+
+            st.subheader(
+                "👨‍⚕️ Professional Guidance"
+            )
 
             st.markdown(
                 """
@@ -1342,21 +1347,21 @@ Both medicines belong to the **NSAID** class and may increase the risk of stomac
             )
 
 
-            # ==========================================================
-            # FOOTER
-            # ==========================================================
+# ==========================================================
+# FOOTER
+# ==========================================================
 
-            st.markdown(
-                """
-                <div class="footer">
+st.markdown(
+    """
+    <div class="footer">
 
-                <strong>SmartRx AI © 2026</strong><br><br>
+    <strong>SmartRx AI © 2026</strong><br><br>
 
-                AI-Powered Medication & Herbal Safety Intelligence<br>
+    AI-Powered Medication & Herbal Safety Intelligence<br>
 
-                Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
+    Developed by Chizix Orbit Digital Innovations Ltd. 🇳🇬
 
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+    </div>
+    """,
+    unsafe_allow_html=True
+)
