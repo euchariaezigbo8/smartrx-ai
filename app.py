@@ -994,21 +994,21 @@ if not selected_herb_data.empty:
 
         for _, interaction in herb_interactions.iterrows():
 
-            drug_class = str(
-                interaction.get("Drug_Class", "")
-            ).strip()
+    drug_class = str(
+        interaction.get("Drug_Class", "")
+    ).strip()
 
-            risk = str(
-                interaction.get("Risk", "Moderate")
-            ).strip()
+    risk = str(
+        interaction.get("Risk", "Moderate")
+    ).strip()
 
-            evidence = interaction.get(
-                "Evidence_Note",
-                interaction.get(
-                    "Evidence",
-                    "Structured interaction information from the SmartRx AI database."
-                )
-            )
+    evidence = interaction.get(
+        "Evidence_Note",
+        interaction.get(
+            "Evidence",
+            "Structured interaction information from the SmartRx AI database."
+        )
+    )
 
             if pd.isna(evidence):
                 evidence = (
